@@ -1,0 +1,204 @@
+@{
+    ViewData["Title"] = "Perfil del Administrador";
+    var nombre = Context.Session.GetString("UserName") ?? "Administrador";
+    var email  = Context.Session.GetString("UserEmail") ?? "admin@biblioteca.local";
+    var rol    = Context.Session.GetString("UserRol") ?? "Administrador";
+}
+
+<style>
+    .perfil-shell { background: #f8fafc; min-height: 100vh; padding-bottom: 4rem; }
+
+    .hero-perfil {
+        background: linear-gradient(135deg, #0369a1 0%, #0ea5e9 50%, #38bdf8 100%);
+        border-radius: 0 0 3rem 3rem;
+        padding: 4rem 2rem 6rem;
+        position: relative;
+        overflow: hidden;
+        color: white;
+    }
+    .hero-perfil::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .avatar-hero {
+        width: 120px; height: 120px;
+        border-radius: 50%;
+        border: 5px solid rgba(255,255,255,0.5);
+        background: rgba(255,255,255,0.2);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 3rem; font-weight: 800; color: white;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .profile-card {
+        background: white;
+        border-radius: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        border: 1px solid #f1f5f9;
+        margin-top: -3rem;
+        position: relative;
+    }
+    .stat-item {
+        padding: 1.25rem;
+        border-radius: 1rem;
+        background: #f8fafc;
+        transition: 0.3s;
+    }
+    .stat-item:hover { background: #e0f2fe; transform: translateY(-2px); }
+    .form-label { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: #64748b; }
+    .info-row {
+        display: flex; align-items: center; gap: 1rem;
+        padding: 1rem; border-radius: 1rem;
+        border: 1px solid #f1f5f9;
+        transition: 0.25s;
+    }
+    .info-row:hover { background: #f8fafc; border-color: #0ea5e9; }
+</style>
+
+<div class="perfil-shell">
+    <!-- Hero -->
+    <div class="hero-perfil text-center">
+        <div class="avatar-hero mx-auto mb-3">@nombre.Substring(0,1).ToUpper()</div>
+        <h1 class="fw-bold mb-1">@nombre</h1>
+        <p class="opacity-75 mb-2">@email</p>
+        <span class="badge bg-white text-primary fw-bold px-3 py-2 rounded-pill">
+            <i class="fas fa-shield-alt me-1"></i> @rol
+        </span>
+    </div>
+
+    <div class="container" style="max-width: 900px;">
+        <!-- Stats Row -->
+        <div class="profile-card p-4 mb-4">
+            <div class="row g-3 text-center">
+                <div class="col-4">
+                    <div class="stat-item">
+                        <div class="fw-bold text-primary fs-4">∞</div>
+                        <div class="text-muted small">Permisos</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="stat-item">
+                        <div class="fw-bold text-success fs-4"><i class="fas fa-check-circle"></i></div>
+                        <div class="text-muted small">Estado Activo</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="stat-item">
+                        <div class="fw-bold text-info fs-4"><i class="fas fa-crown"></i></div>
+                        <div class="text-muted small">Acceso Total</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Información -->
+            <div class="col-lg-6">
+                <div class="profile-card p-4 h-100" style="margin-top: 0;">
+                    <h5 class="fw-bold text-dark mb-4"><i class="fas fa-user-circle text-primary me-2"></i>Información Personal</h5>
+                    <div class="vstack gap-3">
+                        <div class="info-row">
+                            <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <div class="small text-muted">Nombre Completo</div>
+                                <div class="fw-bold text-dark">@nombre</div>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="bg-info-subtle text-info rounded-circle d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div>
+                                <div class="small text-muted">Correo Electrónico</div>
+                                <div class="fw-bold text-dark">@email</div>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="bg-warning-subtle text-warning rounded-circle d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div>
+                                <div class="small text-muted">Rol del Sistema</div>
+                                <div class="fw-bold text-dark">@rol</div>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div>
+                                <div class="small text-muted">Fecha de Acceso</div>
+                                <div class="fw-bold text-dark">@DateTime.Now.ToString("dd/MM/yyyy")</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="col-lg-6">
+                <div class="profile-card p-4 h-100" style="margin-top: 0;">
+                    <h5 class="fw-bold text-dark mb-4"><i class="fas fa-cogs text-primary me-2"></i>Acciones de Cuenta</h5>
+
+                    <!-- Cambiar Contraseña -->
+                    <div class="mb-4 p-3 border rounded-3">
+                        <h6 class="fw-bold mb-3"><i class="fas fa-key text-warning me-2"></i>Cambiar Contraseña</h6>
+                        <form id="frmCambiarPwd" method="post" asp-controller="Auth" asp-action="ChangePassword">
+                            @Html.AntiForgeryToken()
+                            <div class="mb-2">
+                                <input type="password" name="currentPassword" class="form-control form-control-sm rounded-3" placeholder="Contraseña actual" required />
+                            </div>
+                            <div class="mb-2">
+                                <input type="password" name="newPassword" class="form-control form-control-sm rounded-3" placeholder="Nueva contraseña" required />
+                            </div>
+                            <div class="mb-3">
+                                <input type="password" id="confirmPwd" class="form-control form-control-sm rounded-3" placeholder="Confirmar nueva contraseña" required />
+                            </div>
+                            <button type="submit" class="btn btn-warning btn-sm rounded-pill w-100 fw-bold">
+                                <i class="fas fa-save me-1"></i> Actualizar Contraseña
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Cerrar Sesión -->
+                    <div class="p-3 border border-danger rounded-3 bg-danger-subtle">
+                        <h6 class="fw-bold text-danger mb-2"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</h6>
+                        <p class="text-muted small mb-3">Se cerrará la sesión activa del administrador y se eliminarán los tokens.</p>
+                        <a asp-controller="Auth" asp-action="Logout" class="btn btn-danger btn-sm rounded-pill w-100 fw-bold">
+                            <i class="fas fa-power-off me-1"></i> Cerrar Sesión Ahora
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Permisos -->
+        <div class="profile-card p-4 mt-4" style="margin-top: 1.5rem !important;">
+            <h5 class="fw-bold text-dark mb-4"><i class="fas fa-key text-primary me-2"></i>Permisos del Administrador</h5>
+            <div class="row g-2">
+                @foreach (var permiso in new[] {
+                    ("fa-book","Control de Catálogo","text-primary"),
+                    ("fa-users","Gestión de Usuarios","text-success"),
+                    ("fa-book-reader","Préstamos y Devoluciones","text-warning"),
+                    ("fa-dollar-sign","Ventas y Finanzas","text-info"),
+                    ("fa-gavel","Multas y Pagos","text-danger"),
+                    ("fa-chart-bar","Reportes Generales","text-secondary"),
+                    ("fa-history","Auditoría Total","text-dark"),
+                    ("fa-cog","Configuración del Sistema","text-primary")
+                })
+                {
+                    <div class="col-md-3 col-6">
+                        <div class="d-flex align-items-center gap-2 p-2 bg-success-subtle rounded-3">
+                            <i class="fas @permiso.Item1 @permiso.Item3 small"></i>
+                            <span class="extra-small fw-bold text-dark">@permiso.Item2</span>
+                            <i class="fas fa-check-circle text-success ms-auto small"></i>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,83 @@
+@model List<MultaDto>
+@{
+    ViewData["Title"] = "Mis Multas";
+}
+
+<style>
+    .multas-shell { background: #f8fafc; min-height: 100vh; padding-bottom: 4rem; }
+    .multas-header {
+        background: linear-gradient(135deg, #be123c 0%, #fb7185 100%);
+        color: white; padding: 3rem 2rem;
+        border-radius: 0 0 2.5rem 2.5rem; margin-bottom: 2rem;
+    }
+    .fine-card {
+        background: white; border-radius: 1.5rem;
+        border: 1px solid #fee2e2;
+        box-shadow: 0 4px 15px rgba(190, 18, 60, 0.05);
+        transition: 0.3s; margin-bottom: 1rem;
+    }
+    .fine-card:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(190, 18, 60, 0.1); }
+    .fine-amount { font-size: 1.8rem; font-weight: 800; color: #be123c; }
+    .status-badge { padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+    .status-unpaid { background: #fee2e2; color: #be123c; }
+    .status-paid { background: #dcfce7; color: #15803d; }
+    .btn-pay { background: #be123c; color: white; border-radius: 50px; padding: 0.6rem 1.5rem; font-weight: 700; border: none; transition: 0.3s; }
+    .btn-pay:hover { background: #9f1239; transform: scale(1.05); color: white; }
+</style>
+
+<div class="multas-shell">
+    <div class="multas-header">
+        <div class="container">
+            <h1 class="fw-bold mb-1"><i class="fas fa-gavel me-2"></i> Mis Multas</h1>
+            <p class="opacity-75 mb-0">Gestiona tus multas pendientes y evita bloqueos en el sistema.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        @if (TempData["Msg"] != null) {
+            <div class="alert alert-success rounded-4 shadow-sm border-0 mb-4"><i class="fas fa-check-circle me-2"></i> @TempData["Msg"]</div>
+        }
+        @if (TempData["Err"] != null) {
+            <div class="alert alert-danger rounded-4 shadow-sm border-0 mb-4"><i class="fas fa-exclamation-circle me-2"></i> @TempData["Err"]</div>
+        }
+
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                @if (Model != null && Model.Any()) {
+                    foreach (var m in Model) {
+                        <div class="fine-card p-4">
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                                <div>
+                                    <div class="small text-muted text-uppercase fw-bold mb-1">Monto a pagar</div>
+                                    <div class="fine-amount">Bs. @(m.Monto.ToString("F2"))</div>
+                                    <div class="mt-2">
+                                        <span class="status-badge @(m.Pagada ? "status-paid" : "status-unpaid")">
+                                            @(m.Pagada ? "Pagada" : "Pendiente")
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="text-md-end">
+                                    <div class="mb-2"><i class="fas fa-calendar-alt text-muted me-2"></i> Generada: @m.FechaGeneracion.ToString("dd/MM/yyyy")</div>
+                                    @if (!m.Pagada) {
+                                        <a href="/MiBiblioteca/PagoQr?id=@m.Id&monto=@m.Monto" class="btn btn-pay">
+                                            <i class="fas fa-qrcode me-2"></i> Pagar con QR
+                                        </a>
+                                    } else {
+                                        <div class="text-success fw-bold"><i class="fas fa-check-double me-1"></i> Transaccion Completada</div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                } else {
+                    <div class="text-center py-5 bg-white rounded-4 border">
+                        <i class="fas fa-smile-beam fa-4x text-success opacity-25 mb-3"></i>
+                        <h4 class="fw-bold">¡Sin multas pendientes!</h4>
+                        <p class="text-muted">Mantienes un record impecable en la biblioteca.</p>
+                        <a href="/Catalogo/Index" class="btn btn-primary rounded-pill px-4 mt-2">Seguir leyendo</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

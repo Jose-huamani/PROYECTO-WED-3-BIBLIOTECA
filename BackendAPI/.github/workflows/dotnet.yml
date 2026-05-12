@@ -1,0 +1,21 @@
+name: Build and test API
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Restore
+        run: dotnet restore "Proyecto3Api/Proyecto3Api.csproj"
+      - name: Build
+        run: dotnet build "Proyecto3Api/Proyecto3Api.csproj" --no-restore -c Release

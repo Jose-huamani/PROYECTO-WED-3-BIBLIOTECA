@@ -1,0 +1,257 @@
+@{
+    ViewData["Title"] = "Buscar por QR";
+}
+
+<style>
+    :root {
+        --primary-deep: #423A8E;
+        --accent-cyan: #8b5cf6;
+        --dark-dark: #0a0a0a;
+        --glow-cyan: rgba(0, 204, 205, 0.3);
+    }
+
+    .bg-gradient-dark {
+        background: linear-gradient(135deg, var(--dark-dark) 0%, #171717 100%);
+    }
+
+    /* --- LECTOR QR CON ESTILO FUTURISTA --- */
+    .qr-container-modern {
+        position: relative;
+        border-radius: 2rem;
+        overflow: hidden;
+        background: #000;
+        border: 2px solid rgba(255,255,255,0.1);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    #qr-reader {
+        width: 100% !important;
+        border: none !important;
+    }
+
+    /* Línea de escaneo animada */
+    .scanner-line {
+        position: absolute;
+        width: 100%;
+        height: 3px;
+        background: var(--accent-cyan);
+        top: 0;
+        left: 0;
+        z-index: 10;
+        box-shadow: 0 0 15px var(--accent-cyan);
+        animation: scanMove 3s linear infinite;
+        display: none; /* Se activa por JS */
+    }
+
+    @@keyframes scanMove {
+        0% {
+            top: 0;
+        }
+
+        50% {
+            top: 100%;
+        }
+
+        100% {
+            top: 0;
+        }
+    }
+
+    .qr-guide {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 200px;
+        height: 200px;
+        border: 2px solid var(--accent-cyan);
+        border-radius: 20px;
+        z-index: 5;
+        box-shadow: 0 0 0 2000px rgba(0,0,0,0.5);
+        pointer-events: none;
+    }
+
+    /* --- INPUT DE CÓDIGO --- */
+    .code-input-group .form-control {
+        font-family: 'Monaco', 'Consolas', monospace;
+        letter-spacing: 2px;
+        border: 2px solid #e2e8f0;
+        transition: all 0.3s;
+    }
+
+        .code-input-group .form-control:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 4px var(--glow-cyan);
+        }
+
+    /* --- BOTONES --- */
+    .btn-action-qr {
+        padding: 1rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 800;
+        transition: all 0.3s;
+    }
+
+    .btn-start-camera {
+        background: var(--dark-dark);
+        color: var(--accent-cyan);
+        border: 1px solid var(--accent-cyan);
+    }
+
+        .btn-start-camera:hover {
+            background: var(--accent-cyan);
+            color: var(--dark-dark);
+            box-shadow: 0 10px 25px var(--glow-cyan);
+        }
+</style>
+
+<div class="container py-5 animate__animated animate__fadeIn">
+    <!-- Header Hero -->
+    <div class="header-premium p-4 p-md-5 mb-5 rounded-5 shadow-lg position-relative overflow-hidden bg-gradient-dark">
+        <div class="position-relative z-index-10 text-white d-flex justify-content-between align-items-center">
+            <div>
+                <div class="d-flex align-items-center mb-2">
+                    <div class="bg-accent-cyan p-2 rounded-3 me-3" style="width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-qrcode text-dark"></i>
+                    </div>
+                    <span class="text-uppercase fw-bold ls-2 small opacity-75">IA Vision & Tracking</span>
+                </div>
+                <h1 class="display-6 fw-800 mb-0">Buscador Inteligente</h1>
+                <p class="opacity-75 d-none d-md-block">Identificación instantánea de activos y ejemplares.</p>
+            </div>
+            <a asp-action="Dashboard" class="btn btn-blur rounded-circle p-3 shadow-sm">
+                <i class="fas fa-th-large"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-5 justify-content-center">
+        <!-- Columna del Escáner -->
+        <div class="col-lg-7">
+            <div class="qr-container-modern shadow-lg">
+                <div id="qr-reader" style="min-height: 400px;"></div>
+                <div class="scanner-line" id="scanLine"></div>
+                <div class="qr-guide" id="qrGuide" style="display: none;"></div>
+
+                <!-- Overlay de Espera -->
+                <div id="cameraPlaceholder" class="text-center py-5" style="background: #0a0a0a; height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <i class="fas fa-camera fa-3x text-white opacity-20 mb-3"></i>
+                    <p class="text-white opacity-50 fw-bold">Cámara Inactiva</p>
+                </div>
+            </div>
+
+            <div class="text-center mt-4 hstack gap-3 justify-content-center">
+                <button type="button" id="btn-qr-start" class="btn btn-action-qr btn-start-camera shadow">
+                    <i class="fas fa-video me-2"></i>ENCENDER CÁMARA
+                </button>
+                <button type="button" id="btn-qr-stop" class="btn btn-action-qr btn-danger shadow" hidden>
+                    <i class="fas fa-power-off me-2"></i>DETENER
+                </button>
+            </div>
+            <p id="qr-camera-msg" class="text-center small fw-bold mt-3 text-primary"></p>
+        </div>
+
+        <!-- Columna del Formulario -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-lg rounded-5 h-100">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-5">
+                        <div class="bg-light rounded-4 p-4 d-inline-block mb-3 shadow-sm">
+                            <i class="fas fa-database fa-2x text-white"></i>
+                        </div>
+                        <h3 class="fw-800 text-white">Resultado del Escaneo</h3>
+                        <p class="text-muted small">El código detectado se vinculará automáticamente al registro.</p>
+                    </div>
+
+                    <form asp-action="BuscarQr" method="post" id="qrForm">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-4">
+                            <label class="form-label text-uppercase fw-bold text-muted extra-small ls-1">Código de Referencia</label>
+                            <div class="input-group code-input-group shadow-sm">
+                                <span class="input-group-text bg-white border-end-0 rounded-start-4">
+                                    <i class="fas fa-fingerprint text-accent"></i>
+                                </span>
+                                <input name="codigo" id="codigo" class="form-control form-control-lg border-start-0 ps-0 rounded-end-4 fw-bold"
+                                       placeholder="LECTURA PENDIENTE..." required readonly />
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-3">
+                            <button type="submit" class="btn btn-dark-accent btn-lg fw-800 py-3 rounded-pill shadow" id="btnSubmit" disabled>
+                                <i class="fas fa-search-location me-2"></i>LOCALIZAR EN SISTEMA
+                            </button>
+                            <div class="text-center">
+                                <span class="extra-small text-muted"><i class="fas fa-info-circle me-1"></i>Acepta códigos QR y Barcode estándar.</span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script>
+        (function () {
+            const startBtn = document.getElementById('btn-qr-start');
+            const stopBtn = document.getElementById('btn-qr-stop');
+            const input = document.getElementById('codigo');
+            const msg = document.getElementById('qr-camera-msg');
+            const scanLine = document.getElementById('scanLine');
+            const qrGuide = document.getElementById('qrGuide');
+            const placeholder = document.getElementById('cameraPlaceholder');
+            const btnSubmit = document.getElementById('btnSubmit');
+            let scanner = null;
+
+            function updateUI(scanning) {
+                startBtn.hidden = scanning;
+                stopBtn.hidden = !scanning;
+                scanLine.style.display = scanning ? 'block' : 'none';
+                qrGuide.style.display = scanning ? 'block' : 'none';
+                placeholder.style.display = scanning ? 'none' : 'flex';
+                if(!scanning) msg.textContent = "";
+            }
+
+            startBtn.addEventListener('click', async function () {
+                msg.textContent = "Iniciando sistema de visión...";
+                scanner = new Html5Qrcode("qr-reader");
+
+                try {
+                    await scanner.start(
+                        { facingMode: "environment" },
+                        { fps: 20, qrbox: { width: 250, height: 250 } },
+                        (decodedText) => {
+                            input.value = decodedText;
+                            input.classList.add('is-valid');
+                            btnSubmit.disabled = false;
+
+                            // Sonido de éxito (opcional)
+                            const audio = new Audio('https://www.soundjay.com/buttons/beep-07a.mp3');
+                            audio.play().catch(() => {});
+
+                            stopBtn.click();
+                        },
+                        () => {} // Frame error
+                    );
+                    updateUI(true);
+                    msg.textContent = "Escaner activo: Apunte al código";
+                } catch (err) {
+                    msg.textContent = "Error: Cámara no disponible.";
+                    msg.classList.add('text-danger');
+                }
+            });
+
+            stopBtn.addEventListener('click', async function () {
+                if (scanner) {
+                    await scanner.stop();
+                    scanner.clear();
+                    scanner = null;
+                }
+                updateUI(false);
+            });
+        })();
+    </script>
+}

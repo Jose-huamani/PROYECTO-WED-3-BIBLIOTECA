@@ -1,0 +1,117 @@
+﻿@{
+    ViewData["Title"] = "Mi Perfil";
+    var nombre = Context.Session.GetString("UserName") ?? "Usuario";
+    var email = Context.Session.GetString("UserEmail") ?? "";
+    var rol = Context.Session.GetString("UserRole") ?? "Estudiante";
+}
+
+<style>
+    .perfil-shell { background:#f8fafc; min-height:100vh; padding-bottom:4rem; }
+    .hero-perfil { background:linear-gradient(135deg,#0369a1,#0ea5e9,#38bdf8); color:white; padding:4rem 2rem; border-radius:0 0 3rem 3rem; }
+    .avatar { width:100px;height:100px;border-radius:50%;border:4px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:2.5rem;font-weight:800;color:white; }
+    .p-card { background:white;border-radius:1.5rem;border:1px solid #e2e8f0;box-shadow:0 2px 12px rgba(0,0,0,0.05);padding:1.5rem; }
+    .info-row { display:flex;align-items:center;gap:1rem;padding:0.9rem;border-radius:1rem;border:1px solid #f1f5f9;transition:0.2s; }
+    .info-row:hover { background:#f0f9ff;border-color:#0ea5e9; }
+    .info-icon { width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center; }
+    .form-control, .form-select { border-radius:0.75rem;border:1.5px solid #e2e8f0;padding:0.65rem 1rem; }
+    .form-control:focus, .form-select:focus { border-color:#0ea5e9;box-shadow:0 0 0 4px rgba(14,165,233,0.1); }
+    .form-label { font-size:0.78rem;font-weight:700;text-transform:uppercase;color:#64748b; }
+    .menu-link { display:flex;align-items:center;gap:0.75rem;padding:0.85rem 1rem;border-radius:1rem;color:#334155;text-decoration:none;font-weight:600;transition:0.2s;border:1px solid transparent; }
+    .menu-link:hover, .menu-link.active { background:#e0f2fe;color:#0369a1;border-color:#bae6fd; }
+    .menu-link i { width:20px;text-align:center; }
+    .btn-primary-custom { background:linear-gradient(135deg,#0369a1,#0ea5e9);border:none;color:white;border-radius:50px;padding:0.7rem 2rem;font-weight:700;transition:0.3s; }
+    .btn-primary-custom:hover { transform:translateY(-2px);box-shadow:0 8px 20px rgba(14,165,233,0.4);color:white; }
+</style>
+
+<div class="perfil-shell">
+    <div class="hero-perfil text-center">
+        <div class="avatar mx-auto mb-3">@nombre.Substring(0,1).ToUpper()</div>
+        <h2 class="fw-bold mb-1">@nombre</h2>
+        <p class="opacity-75 mb-2">@email</p>
+        <span class="badge bg-white bg-opacity-25 text-white fw-bold px-3 py-2 rounded-pill">@rol</span>
+    </div>
+
+    <div class="container" style="max-width:960px; margin-top:-2rem;">
+        <div class="row g-4">
+            <!-- Menu lateral -->
+            <div class="col-lg-3">
+                <div class="p-card">
+                    <div class="small fw-bold text-muted text-uppercase mb-3" style="letter-spacing:1px;">Menu</div>
+                    <div class="vstack gap-1">
+                        <a href="/MiBiblioteca/Prestamos" class="menu-link"><i class="fas fa-book-reader text-primary"></i> Mis Prestamos</a>
+                        <a href="/MiBiblioteca/Reservas" class="menu-link"><i class="fas fa-bookmark text-purple" style="color:#7c3aed;"></i> Mis Reservas</a>
+                        <a href="/MiBiblioteca/Favoritos" class="menu-link"><i class="fas fa-heart text-danger"></i> Favoritos</a>
+                        <a href="/Usuario/MisVentas" class="menu-link"><i class="fas fa-shopping-bag text-success"></i> Mis Compras</a>
+                        <a href="/Usuario/Ranking" class="menu-link"><i class="fas fa-trophy text-warning"></i> Ranking</a>
+                        <a href="/MiBiblioteca/Notificaciones" class="menu-link"><i class="fas fa-bell text-info"></i> Notificaciones</a>
+                        <hr class="my-2">
+                        <form asp-controller="Account" asp-action="Logout" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="menu-link w-100 border-0 bg-transparent text-danger"><i class="fas fa-sign-out-alt"></i> Cerrar Sesion</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido principal -->
+            <div class="col-lg-9">
+                <!-- Info personal -->
+                <div class="p-card mb-4">
+                    <h5 class="fw-bold mb-4"><i class="fas fa-user-circle text-primary me-2"></i>Informacion Personal</h5>
+                    <div class="vstack gap-3">
+                        <div class="info-row">
+                            <div class="info-icon" style="background:#e0f2fe;color:#0369a1;"><i class="fas fa-user"></i></div>
+                            <div><div class="small text-muted">Nombre Completo</div><div class="fw-bold text-dark">@nombre</div></div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-icon" style="background:#f0fdf4;color:#15803d;"><i class="fas fa-envelope"></i></div>
+                            <div><div class="small text-muted">Correo Electronico</div><div class="fw-bold text-dark">@email</div></div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-icon" style="background:#fef9c3;color:#854d0e;"><i class="fas fa-shield-alt"></i></div>
+                            <div><div class="small text-muted">Rol del Sistema</div><div class="fw-bold text-dark">@rol</div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cambiar contrasena -->
+                <div class="p-card mb-4">
+                    <h5 class="fw-bold mb-4"><i class="fas fa-key text-warning me-2"></i>Cambiar Contrasena</h5>
+                    <form asp-controller="Auth" asp-action="ChangePassword" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Contrasena Actual</label>
+                                <input type="password" name="currentPassword" class="form-control" placeholder="Actual" required />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Nueva Contrasena</label>
+                                <input type="password" name="newPassword" class="form-control" placeholder="Nueva" required minlength="6" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Confirmar</label>
+                                <input type="password" id="confirmPwd" class="form-control" placeholder="Repetir" required />
+                            </div>
+                        </div>
+                        <div class="mt-3 text-end">
+                            <button type="submit" class="btn btn-primary-custom">
+                                <i class="fas fa-save me-2"></i>Actualizar Contrasena
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Acciones rapidas -->
+                <div class="p-card">
+                    <h5 class="fw-bold mb-4"><i class="fas fa-bolt text-info me-2"></i>Accesos Rapidos</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6"><a href="/MiBiblioteca/Prestamos" class="btn w-100 py-3 rounded-3 fw-bold" style="background:#e0f2fe;color:#0369a1;"><i class="fas fa-book-reader me-2"></i>Ver Mis Prestamos</a></div>
+                        <div class="col-md-6"><a href="/MiBiblioteca/Reservas" class="btn w-100 py-3 rounded-3 fw-bold" style="background:#f5f3ff;color:#7c3aed;"><i class="fas fa-bookmark me-2"></i>Ver Mis Reservas</a></div>
+                        <div class="col-md-6"><a href="/Tienda/Carrito" class="btn w-100 py-3 rounded-3 fw-bold" style="background:#f0fdf4;color:#15803d;"><i class="fas fa-shopping-cart me-2"></i>Mi Carrito</a></div>
+                        <div class="col-md-6"><a href="/Usuario/Ranking" class="btn w-100 py-3 rounded-3 fw-bold" style="background:#fef9c3;color:#854d0e;"><i class="fas fa-trophy me-2"></i>Ver Ranking</a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

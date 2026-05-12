@@ -1,0 +1,135 @@
+@{
+    ViewData["Title"] = "Mi Historial";
+    var prestamos = ViewBag.Prestamos as List<PrestamoDto> ?? new();
+    var reservas = ViewBag.Reservas as List<ReservaDto> ?? new();
+    var ventas = ViewBag.Ventas as List<VentaDto> ?? new();
+    var multas = ViewBag.Multas as List<MultaDto> ?? new();
+}
+
+<style>
+    .hist-shell { background: #f8fafc; min-height: 100vh; padding-bottom: 4rem; }
+    .hist-header {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        color: white; padding: 3rem 2rem;
+        border-radius: 0 0 2.5rem 2.5rem; margin-bottom: 2rem;
+    }
+    .nav-pills .nav-link {
+        border-radius: 50px; padding: 0.6rem 1.5rem; font-weight: 700; color: #64748b;
+        transition: 0.3s; margin-right: 0.5rem;
+    }
+    .nav-pills .nav-link.active { background: #0ea5e9; color: white; }
+    .hist-card {
+        background: white; border-radius: 1.25rem; border: 1px solid #e2e8f0;
+        margin-bottom: 1rem; padding: 1.25rem; transition: 0.2s;
+    }
+    .hist-card:hover { border-color: #0ea5e9; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .badge-status { padding: 3px 10px; border-radius: 50px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; }
+</style>
+
+<div class="hist-shell">
+    <div class="hist-header">
+        <div class="container">
+            <h1 class="fw-bold mb-1"><i class="fas fa-history me-2"></i> Mi Historial Completo</h1>
+            <p class="opacity-75 mb-0">Revisa toda tu actividad, desde prestamos hasta compras y multas.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <ul class="nav nav-pills mb-4 justify-content-center" id="histTabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-prestamos">
+                    <i class="fas fa-book-reader me-2"></i> Prestamos (@prestamos.Count)
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-reservas">
+                    <i class="fas fa-bookmark me-2"></i> Reservas (@reservas.Count)
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-compras">
+                    <i class="fas fa-shopping-cart me-2"></i> Compras (@ventas.Count)
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-multas">
+                    <i class="fas fa-gavel me-2"></i> Multas (@multas.Count)
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="histTabsContent">
+            <!-- PRESTAMOS -->
+            <div class="tab-pane fade show active" id="tab-prestamos">
+                @if (prestamos.Any()) {
+                    @foreach (var p in prestamos) {
+                        <div class="hist-card d-flex align-items-center justify-content-between flex-wrap gap-3">
+                            <div>
+                                <div class="fw-bold text-dark">Libro: @(p.Detalles.FirstOrDefault()?.Libro?.Titulo ?? "Varios libros")</div>
+                                <div class="small text-muted">Fecha: @p.FechaPrestamo.ToString("dd/MM/yyyy")</div>
+                            </div>
+                            <span class="badge-status @(p.Estado == 1 ? "bg-success-subtle text-success" : "bg-secondary-subtle text-secondary")">
+                                @(p.Estado == 1 ? "Activo" : "Devuelto")
+                            </span>
+                        </div>
+                    }
+                } else {
+                    <div class="text-center py-5">No hay prestamos en tu historial.</div>
+                }
+            </div>
+
+            <!-- RESERVAS -->
+            <div class="tab-pane fade" id="tab-reservas">
+                @if (reservas.Any()) {
+                    @foreach (var r in reservas) {
+                        <div class="hist-card d-flex align-items-center justify-content-between flex-wrap gap-3">
+                            <div>
+                                <div class="fw-bold text-dark">Libro: @(r.Libro?.Titulo ?? "Libro")</div>
+                                <div class="small text-muted">Fecha: @r.FechaReserva.ToString("dd/MM/yyyy")</div>
+                            </div>
+                            <span class="badge-status bg-info-subtle text-info">Reserva</span>
+                        </div>
+                    }
+                } else {
+                    <div class="text-center py-5">No hay reservas en tu historial.</div>
+                }
+            </div>
+
+            <!-- COMPRAS -->
+            <div class="tab-pane fade" id="tab-compras">
+                @if (ventas.Any()) {
+                    @foreach (var v in ventas) {
+                        <div class="hist-card d-flex align-items-center justify-content-between flex-wrap gap-3">
+                            <div>
+                                <div class="fw-bold text-dark">Venta #@v.Id</div>
+                                <div class="small text-muted">Fecha: @v.FechaVenta.ToString("dd/MM/yyyy")</div>
+                            </div>
+                            <div class="fw-bold text-primary">Bs. @v.Total.ToString("F2")</div>
+                        </div>
+                    }
+                } else {
+                    <div class="text-center py-5">No hay compras en tu historial.</div>
+                }
+            </div>
+
+            <!-- MULTAS -->
+            <div class="tab-pane fade" id="tab-multas">
+                @if (multas.Any()) {
+                    @foreach (var m in multas) {
+                        <div class="hist-card d-flex align-items-center justify-content-between flex-wrap gap-3">
+                            <div>
+                                <div class="fw-bold text-dark">Multa Generada</div>
+                                <div class="small text-muted">Fecha: @m.FechaGeneracion.ToString("dd/MM/yyyy")</div>
+                            </div>
+                            <div class="fw-bold @(m.Pagada ? "text-success" : "text-danger")">
+                                Bs. @m.Monto.ToString("F2") @(m.Pagada ? "(Pagada)" : "(Pendiente)")
+                            </div>
+                        </div>
+                    }
+                } else {
+                    <div class="text-center py-5">No hay multas en tu historial.</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

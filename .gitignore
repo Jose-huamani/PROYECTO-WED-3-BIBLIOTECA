@@ -1,0 +1,37 @@
+# .gitignore for Consolidated Library Project
+
+# Android
+.gradle/
+.idea/
+build/
+local.properties
+*.iml
+.kotlin/
+
+# .NET / C#
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.db-shm
+*.db-wal
+
+# Web / Node
+node_modules/
+.next/
+dist/
+build/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# General
+*.log
+*.bak
+.DS_Store
+Thumbs.db

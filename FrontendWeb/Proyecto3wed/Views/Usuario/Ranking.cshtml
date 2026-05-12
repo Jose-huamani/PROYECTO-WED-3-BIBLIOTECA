@@ -1,0 +1,112 @@
+﻿@model List<Proyecto3wed.Models.RankingDto>
+@{
+    ViewData["Title"] = "Ranking de Lectores";
+}
+
+<style>
+    .rank-shell { background: #f8fafc; min-height: 100vh; padding-bottom: 4rem; }
+    .rank-header {
+        background: linear-gradient(135deg, #0f172a 0%, #0369a1 100%);
+        color: white; padding: 3rem 2rem;
+        border-radius: 0 0 2.5rem 2.5rem; margin-bottom: 2rem;
+    }
+    .podium-card {
+        background: white; border-radius: 2rem; border: none;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        transition: 0.3s; position: relative; overflow: hidden;
+    }
+    .podium-card:hover { transform: translateY(-10px); }
+    .rank-1 { border-top: 8px solid #fbbf24; margin-top: -1rem; }
+    .rank-2 { border-top: 8px solid #94a3b8; }
+    .rank-3 { border-top: 8px solid #92400e; }
+    .podium-number {
+        position: absolute; top: -10px; right: -10px;
+        font-size: 5rem; font-weight: 900; opacity: 0.05;
+    }
+    .avatar-rank {
+        width: 80px; height: 80px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 2rem; font-weight: 800; margin: 0 auto 1rem;
+        background: #f1f5f9; color: #64748b;
+    }
+    .rank-1 .avatar-rank { background: #fef3c7; color: #b45309; border: 4px solid #fcd34d; }
+    .rank-list-item {
+        background: white; border-radius: 1rem; padding: 1rem 1.5rem;
+        border: 1px solid #e2e8f0; transition: 0.2s; margin-bottom: 0.75rem;
+    }
+    .rank-list-item:hover { border-color: #0ea5e9; background: #f0f9ff; }
+</style>
+
+<div class="rank-shell">
+    <div class="rank-header text-center">
+        <div class="container">
+            <h1 class="fw-bold mb-1"><i class="fas fa-trophy text-warning me-2"></i> Ranking de Lectores</h1>
+            <p class="opacity-75 mb-0">¡Felicidades a nuestros lectores mas dedicados! Acumula puntos leyendo mas.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- TOP 3 PODIUM -->
+        <div class="row g-4 align-items-end mb-5">
+            @if (Model.Count > 1) {
+                <!-- SEGUNDO LUGAR -->
+                <div class="col-md-4 order-md-1">
+                    <div class="podium-card rank-2 p-4 text-center">
+                        <div class="podium-number">2</div>
+                        <div class="avatar-rank">@Model[1].Nombre.Substring(0,1).ToUpper()</div>
+                        <h5 class="fw-bold text-dark">@Model[1].Nombre</h5>
+                        <div class="text-primary fw-bold fs-4">@Model[1].Puntos pts</div>
+                        <div class="badge bg-light text-muted border mt-2">Plata</div>
+                    </div>
+                </div>
+            }
+            @if (Model.Count > 0) {
+                <!-- PRIMER LUGAR -->
+                <div class="col-md-4 order-md-0">
+                    <div class="podium-card rank-1 p-5 text-center shadow-lg">
+                        <div class="podium-number">1</div>
+                        <div class="avatar-rank">@Model[0].Nombre.Substring(0,1).ToUpper()</div>
+                        <h4 class="fw-bold text-dark">@Model[0].Nombre</h4>
+                        <div class="text-primary fw-bold fs-2">@Model[0].Puntos pts</div>
+                        <div class="badge bg-warning text-dark fw-bold mt-2 px-3 py-2">👑 CAMPEON</div>
+                    </div>
+                </div>
+            }
+            @if (Model.Count > 2) {
+                <!-- TERCER LUGAR -->
+                <div class="col-md-4 order-md-2">
+                    <div class="podium-card rank-3 p-4 text-center">
+                        <div class="podium-number">3</div>
+                        <div class="avatar-rank">@Model[2].Nombre.Substring(0,1).ToUpper()</div>
+                        <h5 class="fw-bold text-dark">@Model[2].Nombre</h5>
+                        <div class="text-primary fw-bold fs-4">@Model[2].Puntos pts</div>
+                        <div class="badge bg-light text-muted border mt-2">Bronce</div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- RESTO DEL RANKING -->
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="d-flex align-items-center justify-content-between mb-3 px-3">
+                    <h6 class="fw-bold text-muted text-uppercase small">Resto de Competidores</h6>
+                    <span class="text-muted small">Total: @Model.Count lectores</span>
+                </div>
+                @for (int i = 3; i < Model.Count; i++) {
+                    <div class="rank-list-item d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="fw-bold text-muted" style="width:30px;">#@(i+1)</div>
+                            <div class="avatar-rank m-0" style="width:40px;height:40px;font-size:1rem;">@Model[i].Nombre.Substring(0,1).ToUpper()</div>
+                            <div class="fw-bold text-dark">@Model[i].Nombre</div>
+                        </div>
+                        <div class="fw-bold text-primary">@Model[i].Puntos pts</div>
+                    </div>
+                }
+                @if (Model.Count <= 3) {
+                    <div class="text-center py-4 bg-white rounded-4 border text-muted small">Sigue leyendo para escalar en el ranking global.</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

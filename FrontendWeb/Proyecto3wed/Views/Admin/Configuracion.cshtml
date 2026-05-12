@@ -1,0 +1,273 @@
+@{
+    ViewData["Title"] = "Configuración del Sistema";
+}
+
+<style>
+    .config-shell { background: #f8fafc; min-height: 100vh; padding-bottom: 4rem; }
+    .config-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+        color: white;
+        padding: 3rem 2rem;
+        border-radius: 0 0 2.5rem 2.5rem;
+        margin-bottom: 2rem;
+    }
+    .config-section {
+        background: white; border-radius: 1.5rem;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.04);
+        overflow: hidden;
+        transition: 0.3s;
+    }
+    .config-section:hover { box-shadow: 0 8px 30px rgba(14, 165, 233, 0.1); }
+    .config-section-header {
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 1rem 1.5rem;
+    }
+    .config-item {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #f1f5f9;
+        transition: 0.2s;
+    }
+    .config-item:last-child { border-bottom: none; }
+    .config-item:hover { background: #f8fafc; }
+    .form-switch .form-check-input { width: 3em; height: 1.5em; cursor: pointer; }
+    .form-switch .form-check-input:checked { background-color: #0ea5e9; border-color: #0ea5e9; }
+    .theme-btn {
+        border: 2px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 1rem;
+        cursor: pointer;
+        transition: 0.3s;
+        text-align: center;
+    }
+    .theme-btn.active, .theme-btn:hover { border-color: #0ea5e9; background: #e0f2fe; }
+    .save-btn {
+        background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+        border: none; color: white; border-radius: 50px;
+        padding: 0.75rem 2.5rem; font-weight: 700;
+        transition: 0.3s;
+    }
+    .save-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(14,165,233,0.4); color: white; }
+</style>
+
+<div class="config-shell">
+    <div class="config-header">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <div>
+                    <span class="badge bg-info-subtle text-info fw-bold mb-2 px-3">PANEL DE CONTROL</span>
+                    <h1 class="fw-bold mb-1"><i class="fas fa-sliders-h me-3"></i>Configuración del Sistema</h1>
+                    <p class="opacity-75 mb-0">Personaliza la apariencia, notificaciones y parámetros operativos del sistema.</p>
+                </div>
+                <a asp-action="Dashboard" class="btn btn-outline-light rounded-pill px-4">
+                    <i class="fas fa-home me-2"></i>Panel
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row g-4">
+            <!-- Columna Izquierda -->
+            <div class="col-lg-6">
+                <!-- Apariencia -->
+                <div class="config-section mb-4">
+                    <div class="config-section-header">
+                        <h6 class="fw-bold mb-0"><i class="fas fa-palette text-primary me-2"></i>Apariencia e Interfaz</h6>
+                    </div>
+                    <div class="p-4">
+                        <label class="form-label">Tema Visual</label>
+                        <div class="row g-3 mb-4">
+                            <div class="col-6">
+                                <div class="theme-btn active" id="themeLight" onclick="setTheme('light')">
+                                    <i class="fas fa-sun fa-2x text-warning mb-2 d-block"></i>
+                                    <div class="fw-bold text-dark small">Tema Claro</div>
+                                    <div class="text-muted extra-small">Celeste & Blanco</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="theme-btn" id="themeDark" onclick="setTheme('dark')">
+                                    <i class="fas fa-moon fa-2x text-primary mb-2 d-block"></i>
+                                    <div class="fw-bold text-dark small">Tema Oscuro</div>
+                                    <div class="text-muted extra-small">Modo Noche</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="config-item px-0">
+                            <div>
+                                <div class="fw-bold text-dark">Animaciones de la UI</div>
+                                <div class="text-muted small">Efectos de transición en la interfaz</div>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="animaciones" checked>
+                            </div>
+                        </div>
+                        <div class="config-item px-0">
+                            <div>
+                                <div class="fw-bold text-dark">Sidebar Compacto</div>
+                                <div class="text-muted small">Mostrar solo iconos en el menú</div>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="sidebarCompacto">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Idioma -->
+                <div class="config-section mb-4">
+                    <div class="config-section-header">
+                        <h6 class="fw-bold mb-0"><i class="fas fa-globe text-success me-2"></i>Idioma y Región</h6>
+                    </div>
+                    <div class="p-4">
+                        <div class="mb-3">
+                            <label class="form-label">Idioma del Sistema</label>
+                            <select class="form-select rounded-3">
+                                <option selected>🇪🇸 Español (Bolivia)</option>
+                                <option>🇺🇸 English (US)</option>
+                                <option>🇧🇷 Português (Brasil)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Zona Horaria</label>
+                            <select class="form-select rounded-3">
+                                <option selected>America/La_Paz (UTC-4)</option>
+                                <option>America/Bogota (UTC-5)</option>
+                                <option>America/Lima (UTC-5)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Formato de Fecha</label>
+                            <select class="form-select rounded-3">
+                                <option selected>DD/MM/YYYY</option>
+                                <option>MM/DD/YYYY</option>
+                                <option>YYYY-MM-DD</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna Derecha -->
+            <div class="col-lg-6">
+                <!-- Notificaciones -->
+                <div class="config-section mb-4">
+                    <div class="config-section-header">
+                        <h6 class="fw-bold mb-0"><i class="fas fa-bell text-warning me-2"></i>Notificaciones</h6>
+                    </div>
+                    <div>
+                        @foreach (var (label, desc, id, check) in new[] {
+                            ("Alertas de Retrasos", "Notificar préstamos vencidos", "notifRetrasos", true),
+                            ("Nuevas Reservas", "Alertar reservas pendientes", "notifReservas", true),
+                            ("Nuevos Préstamos", "Notificación al crear préstamo", "notifPrestamos", true),
+                            ("Nuevos Registros", "Alerta de nuevos usuarios", "notifUsuarios", false),
+                            ("Reportes Automáticos", "Envío diario de resumen", "notifReportes", false),
+                            ("Actualizaciones del Sistema", "Avisos de mantenimiento", "notifSistema", true)
+                        })
+                        {
+                            <div class="config-item">
+                                <div>
+                                    <div class="fw-bold text-dark">@label</div>
+                                    <div class="text-muted small">@desc</div>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="@id" @(check ? "checked" : "")>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Seguridad -->
+                <div class="config-section mb-4">
+                    <div class="config-section-header">
+                        <h6 class="fw-bold mb-0"><i class="fas fa-lock text-danger me-2"></i>Seguridad del Sistema</h6>
+                    </div>
+                    <div class="p-4">
+                        <div class="mb-3">
+                            <label class="form-label">Tiempo de Sesión (minutos)</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-clock"></i></span>
+                                <input type="number" class="form-control rounded-end-3" value="60" min="15" max="480">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Multa por Día de Retraso (Bs)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Bs.</span>
+                                <input type="number" class="form-control rounded-end-3" value="2" step="0.5" min="0">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Límite de Préstamos por Usuario</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-book"></i></span>
+                                <input type="number" class="form-control rounded-end-3" value="3" min="1" max="10">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Días Máximos de Préstamo</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                                <input type="number" class="form-control rounded-end-3" value="14" min="1" max="60">
+                            </div>
+                        </div>
+                        <div class="config-item px-0">
+                            <div>
+                                <div class="fw-bold text-dark">Doble Factor (2FA)</div>
+                                <div class="text-muted small">Requerir código al iniciar sesión</div>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="twoFactor">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botón Guardar -->
+        <div class="text-center mt-2 mb-4">
+            <button class="btn save-btn px-5 py-3" onclick="guardarConfiguracion()">
+                <i class="fas fa-save me-2"></i> Guardar Configuración
+            </button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function setTheme(theme) {
+        document.getElementById('themeLight').classList.toggle('active', theme === 'light');
+        document.getElementById('themeDark').classList.toggle('active', theme === 'dark');
+        localStorage.setItem('adminTheme', theme);
+        // Apply dark mode preview
+        if (theme === 'dark') {
+            document.body.style.filter = 'invert(1) hue-rotate(180deg)';
+        } else {
+            document.body.style.filter = '';
+        }
+    }
+
+    function guardarConfiguracion() {
+        const btn = event.target;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Guardando...';
+        btn.disabled = true;
+        setTimeout(() => {
+            btn.innerHTML = '<i class="fas fa-check-circle me-2"></i> ¡Configuración Guardada!';
+            btn.style.background = 'linear-gradient(135deg, #10b981, #34d399)';
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-save me-2"></i> Guardar Configuración';
+                btn.style.background = '';
+                btn.disabled = false;
+            }, 2500);
+        }, 1200);
+    }
+
+    // Restore theme preference
+    const savedTheme = localStorage.getItem('adminTheme') || 'light';
+    setTheme(savedTheme);
+</script>
+}

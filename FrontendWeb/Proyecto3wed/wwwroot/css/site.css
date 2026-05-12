@@ -1,0 +1,440 @@
+/* ==========================================================================
+   VARIABLES MAESTRAS (Breeze Premium Palette)
+   ========================================================================== */
+:root {
+    --primary-deep: #423A8E; /* Morado Breeze */
+    --accent-cyan: #00CCCD; /* Cian Eléctrico */
+    --bg-dark-page: #0f172a; /* Fondo Ultra Oscuro para Login */
+    --bg-admin-page: #F3F4F7; /* Gris Humo para el Panel Admin */
+    --card-dark: #1e293b; /* Gris Oxford para Tarjetas */
+    --footer-dark: #1A202C; /* Negro Mate */
+    --text-dark: #2D3748;
+    --white: #ffffff;
+}
+
+/* --- BASE --- */
+html, body {
+    height: 100%;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-admin-page);
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+/* ==========================================================================
+   COMPONENTES DE AUTENTICACIÓN (Login, Registro, Reset)
+   ========================================================================== */
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-dark-page); /* Fondo elegante oscuro */
+    padding: 20px;
+}
+
+.auth-card {
+    background: var(--card-dark); /* Gris Oxford */
+    width: 100%;
+    max-width: 420px;
+    border-radius: 24px;
+    padding: 3rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+    .auth-header h1 {
+        color: #ffffff;
+        font-weight: 800;
+    }
+
+    .auth-header p {
+        color: #94a3b8;
+        font-size: 0.9rem;
+    }
+
+.auth-form .form-label {
+    color: var(--accent-cyan);
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.auth-form .form-control {
+    background-color: var(--bg-dark-page);
+    border: 2px solid #334155;
+    color: #f8fafc;
+    border-radius: 12px;
+    padding: 0.8rem 1rem;
+    transition: all 0.3s ease;
+}
+
+    .auth-form .form-control:focus {
+        border-color: var(--accent-cyan);
+        box-shadow: 0 0 0 4px rgba(0, 204, 205, 0.15);
+        outline: none;
+    }
+
+.btn-auth {
+    background: linear-gradient(135deg, var(--accent-cyan) 0%, #00999a 100%);
+    color: #0f172a;
+    border: none;
+    border-radius: 50px;
+    padding: 0.9rem;
+    font-weight: 800;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+    .btn-auth:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 204, 205, 0.3);
+    }
+
+/* ==========================================================================
+   NAVBAR & NAVEGACIÓN ADMINISTRATIVA
+   ========================================================================== */
+.custom-nav {
+    background-color: var(--primary-deep) !important;
+    padding: 0.8rem 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.brand-icon {
+    background: var(--accent-cyan);
+    color: var(--primary-deep);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 1.2rem;
+}
+
+.nav-link {
+    font-weight: 500;
+    color: rgba(255,255,255,0.8) !important;
+    transition: 0.3s;
+}
+
+    .nav-link:hover {
+        color: var(--accent-cyan) !important;
+    }
+
+/* ==========================================================================
+   DASHBOARD & TABLAS (CRUD DE LIBROS)
+   ========================================================================== */
+.admin-hero {
+    background: linear-gradient(135deg, var(--primary-deep) 0%, #2a2363 100%);
+    border-radius: 20px;
+    padding: 2.5rem;
+    color: white;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(66, 58, 142, 0.2);
+}
+
+.admin-metric {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border-left: 4px solid var(--accent-cyan);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+
+    .admin-metric strong {
+        font-size: 2.2rem;
+        color: var(--primary-deep);
+        display: block;
+    }
+
+/* Normalización de imágenes de libros en tabla */
+.book-thumb {
+    width: 55px;
+    height: 75px;
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.admin-table-wrap {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 25px rgba(66, 58, 142, 0.05);
+}
+
+/* ==========================================================================
+   ELEMENTOS DE IDENTIFICACIÓN (QR & BARCODE)
+   ========================================================================== */
+.qr-preview {
+    background: #f8f9fa;
+    border: 2px dashed #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+.barcode-box {
+    font-family: 'Libre Barcode 128', cursive; /* Requiere fuente en _Layout */
+    font-size: 2.5rem;
+    line-height: 1;
+}
+
+/* ==========================================================================
+   UTILIDADES & ESTADOS
+   ========================================================================== */
+.status-pill {
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+    .status-pill.ok {
+        background: #e6fffa;
+        color: #2c7a7b;
+    }
+
+    .status-pill.danger {
+        background: #fff5f5;
+        color: #c53030;
+    }
+
+.text-accent {
+    color: var(--accent-cyan) !important;
+}
+
+.extra-small {
+    font-size: 0.7rem;
+}
+
+.smaller {
+    font-size: 0.8rem;
+}
+<style >
+:root {
+    --primary-deep: #423A8E;
+    --accent-cyan: #00CCCD;
+    --navy-dark: #1e293b;
+}
+
+/* Utilitarios de Texto */
+.fw-800 {
+    font-weight: 800;
+}
+
+.ls-1 {
+    letter-spacing: 1px;
+}
+
+.ls-2 {
+    letter-spacing: 2px;
+}
+
+.extra-small {
+    font-size: 0.7rem;
+}
+
+/* Degradados y Fondos */
+.bg-gradient-dark {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+.bg-navy {
+    background: #0f172a;
+}
+
+.text-accent {
+    color: var(--accent-cyan) !important;
+}
+
+.bg-accent-cyan {
+    background: var(--accent-cyan);
+}
+
+/* Cards Especiales */
+.btn-tech-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+    .btn-tech-card:hover {
+        background: rgba(0, 204, 205, 0.1);
+        border-color: var(--accent-cyan);
+        transform: translateY(-3px);
+    }
+
+.icon-box-large {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Soft Badges */
+.bg-primary-soft {
+    background: #eef2ff;
+    color: #4338ca;
+}
+
+.bg-warning-soft {
+    background: #fffbeb;
+    color: #b45309;
+}
+
+.bg-success-soft {
+    background: #f0fdf4;
+    color: #15803d;
+}
+
+.custom-table thead th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 1rem;
+    color: #64748b;
+}
+
+.card-report-hover {
+    transition: 0.3s;
+    border: 1px solid #f1f5f9;
+}
+
+    .card-report-hover:hover {
+        transform: scale(1.03);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+    }
+
+</style >
+<style >
+/* Efecto de botones transparentes sobre fondos oscuros */
+.btn-glass-sm {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-align: center;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.btn-glass-sm:hover {
+    background: rgba(0, 204, 205, 0.2);
+    color: #00CCCD;
+    border-color: #00CCCD;
+}
+
+/* Bordes punteados para el grid dinámico */
+.border-dashed {
+    border-style: dashed !important;
+}
+
+/* Estilo para los inputs en modo oscuro */
+.bg-navy input::placeholder {
+    color: rgba(255,255,255,0.4);
+}
+
+/* Botón Cian de alto contraste */
+.btn-accent-cyan {
+    background-color: #00CCCD;
+    color: #0f172a;
+    border: none;
+    transition: 0.3s;
+}
+
+    .btn-accent-cyan:hover {
+        background-color: #00b3b3;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,204,205,0.4);
+    }
+
+</style >
+<style >
+/* ... (mantener tus estilos anteriores) ... */
+/* Botón Editar en la Tabla */
+.btn-edit-main {
+    background: #f1f5f9;
+    color: var(--navy);
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 6px 16px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+}
+
+.btn-edit-main:hover {
+    background: var(--navy);
+    color: var(--accent-cyan);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+}
+
+/* Estilos del Modal de Edición (basado en tu imagen) */
+.modal-edit-custom .modal-content {
+    border-radius: 2rem;
+    border: none;
+}
+
+.modal-edit-custom .modal-header {
+    background: #0f172a;
+    color: white;
+    border-bottom: none;
+    padding: 1.5rem 2rem;
+}
+
+.form-group-custom {
+    margin-bottom: 1.25rem;
+}
+
+.form-label-edit {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.form-input-edit {
+    border-radius: 1rem;
+    border: 1.5px solid #f1f5f9;
+    background: #ffffff;
+    padding: 0.75rem 1.25rem;
+    width: 100%;
+    color: #1e293b;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+    .form-input-edit:focus {
+        border-color: var(--accent-cyan);
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(0, 204, 205, 0.1);
+    }
+
+.btn-save-edit {
+    background: #0f172a;
+    color: white;
+    border-radius: 1rem;
+    padding: 0.75rem 2rem;
+    font-weight: 700;
+    border: none;
+}
+
+</style >

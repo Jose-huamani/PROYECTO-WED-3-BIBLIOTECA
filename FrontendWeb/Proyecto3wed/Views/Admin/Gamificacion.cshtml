@@ -1,0 +1,197 @@
+@model List<RankingDto>
+@{
+    ViewData["Title"] = "Ranking de Lectores";
+}
+
+<style>
+    :root {
+        --glass-bg: rgba(255, 255, 255, 0.05);
+        --neon-cyan: #22d3ee;
+        --gold: #fbbf24;
+        --silver: #94a3b8;
+        --bronze: #d97706;
+    }
+
+    .ranking-wrapper {
+        background: radial-gradient(circle at top right, #0a0a0a, #171717);
+        min-height: 100vh;
+        padding-top: 50px;
+    }
+
+    /* Tarjeta Principal */
+    .glass-leaderboard {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 30px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+
+    /* Estilos para el Podio */
+    .rank-item {
+        transition: all 0.3s ease;
+        border-left: 5px solid transparent;
+    }
+
+        .rank-item:hover {
+            transform: scale(1.01);
+            background: #f8fafc !important;
+        }
+
+    .rank-1 {
+        border-left-color: var(--gold);
+        background: rgba(251, 191, 36, 0.05) !important;
+    }
+
+    .rank-2 {
+        border-left-color: var(--silver);
+        background: rgba(148, 163, 184, 0.05) !important;
+    }
+
+    .rank-3 {
+        border-left-color: var(--bronze);
+        background: rgba(217, 119, 6, 0.05) !important;
+    }
+
+    .trophy-icon {
+        font-size: 1.5rem;
+    }
+
+    .rank-number {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 900;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    .rank-1 .rank-number {
+        background: var(--gold);
+        color: white;
+        box-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
+    }
+
+    .rank-2 .rank-number {
+        background: var(--silver);
+        color: white;
+    }
+
+    .rank-3 .rank-number {
+        background: var(--bronze);
+        color: white;
+    }
+
+    /* Lado Derecho: Perfil */
+    .sidebar-stats {
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 30px;
+    }
+
+    .badge-item {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: 0.3s;
+    }
+
+        .badge-item:hover {
+            background: rgba(34, 211, 238, 0.1);
+            border-color: var(--neon-cyan);
+        }
+</style>
+
+<div class="ranking-wrapper pb-5">
+    <div class="container animate__animated animate__fadeIn">
+        <div class="row g-4">
+            <!-- Listado de Ranking -->
+            <div class="col-lg-8">
+                <div class="glass-leaderboard h-100">
+                    <div class="p-4 text-center border-bottom bg-white">
+                        <span class="badge rounded-pill px-4 py-2 mb-2" style="background: rgba(251, 191, 36, 0.1); color: var(--gold);">
+                            <i class="fas fa-crown me-2"></i>HALL OF FAME
+                        </span>
+                        <h2 class="fw-black text-white mb-0">Top Lectores</h2>
+                    </div>
+
+                    <div class="card-body p-0">
+                        @foreach (var r in Model.Select((v, i) => new { v, i }))
+                        {
+                            var rankClass = r.i == 0 ? "rank-1" : r.i == 1 ? "rank-2" : r.i == 2 ? "rank-3" : "";
+                            <div class="d-flex align-items-center p-4 border-bottom rank-item @rankClass">
+                                <div class="rank-number me-4">
+                                    @if (r.i < 3)
+                                    {
+                                        <i class="fas fa-trophy trophy-icon"></i>
+                                    }
+                                    else
+                                    {
+
+                                        <span>@(r.i + 1)</span>
+                                    }
+                                </div>
+
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-1 fw-bold text-white">@r.v.Nombre</h5>
+                                    <div class="progress rounded-pill" style="height: 8px; width: 100%; max-width: 300px; background: #e2e8f0;">
+                                        <div class="progress-bar" role="progressbar"
+                                             style="width: @(100 - r.i * 8)%; background: linear-gradient(90deg, #3b82f6, var(--neon-cyan));">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-end">
+                                    <h4 class="fw-black mb-0 text-primary">@r.v.Puntos.ToString("N0")</h4>
+                                    <span class="small text-muted text-uppercase fw-bold" style="font-size: 0.65rem;">Experiencia</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel de Logros y Metas -->
+            <div class="col-lg-4">
+                <div class="sidebar-stats p-5 text-white h-100 shadow-2xl">
+                    <div class="text-center mb-5">
+                        <div class="avatar-placeholder mb-3 mx-auto rounded-circle d-flex align-items-center justify-content-center"
+                             style="width: 80px; height: 80px; background: linear-gradient(45deg, var(--neon-cyan), #8b5cf6);">
+                            <i class="fas fa-user-astronaut fa-2x"></i>
+                        </div>
+                        <h4 class="fw-bold mb-0">Tu Progreso</h4>
+                        <span class="text-cyan small fw-bold">NIVEL 12 · MASTER</span>
+                    </div>
+
+                    <h6 class="text-muted text-uppercase small fw-black mb-4">Medallas Obtenidas</h6>
+                    <div class="vstack gap-3">
+                        @foreach (var badge in new[] { ("Explorador Alpha", "fa-compass"), ("Récord de Asistencia", "fa-calendar-check"), ("Crítico Literario", "fa-pen-nib") })
+                        {
+                            <div class="badge-item d-flex align-items-center p-3 rounded-4">
+                                <div class="icon-box bg-cyan bg-opacity-20 rounded-circle p-2 me-3" style="width: 40px; height: 40px; display:flex; align-items:center; justify-content:center;">
+                                    <i class="fas @badge.Item2 text-cyan"></i>
+                                </div>
+                                <span class="fw-semibold small">@badge.Item1</span>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="mt-5 p-4 rounded-5 bg-white text-dark shadow-sm position-relative overflow-hidden">
+                        <div style="position:absolute; top:-10px; right:-10px; opacity:0.1; font-size:4rem;">
+                            <i class="fas fa-flag-checkered"></i>
+                        </div>
+                        <p class="extra-small fw-black text-muted mb-1 text-uppercase">Siguiente Desbloqueo</p>
+                        <h5 class="fw-bold mb-2">Rango Legendario</h5>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar bg-primary" style="width: 75%"></div>
+                        </div>
+                        <p class="extra-small mt-2 mb-0">Faltan <strong>250 pts</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

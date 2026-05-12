@@ -1,0 +1,174 @@
+@model List<LibroDto>
+@{
+    ViewData["Title"] = "Catálogo";
+}
+
+<style>
+    :root {
+        --dark-deep: #0a0a0a;
+        --accent-cyan: #8b5cf6;
+        --soft-gray: #f8fafc;
+    }
+
+    /* --- TARJETAS DE LIBROS --- */
+    .card-libro {
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        border-radius: 1.5rem !important;
+        overflow: hidden;
+        background: white;
+    }
+
+        .card-libro:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(16, 29, 66, 0.15) !important;
+        }
+
+    /* --- PORTADA CON OVERLAY --- */
+    .portada-aside {
+        position: relative;
+        background: var(--soft-gray);
+        min-width: 130px;
+    }
+
+    .img-portada {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .card-libro:hover .img-portada {
+        transform: scale(1.1);
+    }
+
+    /* --- BADGES Y TEXTOS --- */
+    .badge-category {
+        background: rgba(0, 204, 205, 0.1);
+        color: var(--dark-deep);
+        font-size: 0.65rem;
+        letter-spacing: 0.5px;
+        border: 1px solid rgba(0, 204, 205, 0.2);
+    }
+
+    .text-limit-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        min-height: 3rem;
+    }
+
+    /* --- BARRA DE DISPONIBILIDAD --- */
+    .stock-bar-container {
+        height: 6px;
+        background: #e2e8f0;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-top: 8px;
+    }
+
+    .stock-bar-fill {
+        height: 100%;
+        transition: width 1s ease-in-out;
+    }
+
+    /* --- ANIMACIONES --- */
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease-out both;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<!-- Header de Sección -->
+<div class="row mb-5 align-items-center fade-in-up">
+    <div class="col-lg-7">
+        <div class="d-flex align-items-center mb-3">
+            <div class="bg-dark p-2 rounded-3 me-3">
+                <i class="fas fa-library text-accent"></i>
+            </div>
+            <h1 class="h2 fw-800 text-white mb-0">Explora la Colección</h1>
+        </div>
+        <p class="text-muted mb-0">Accede a recursos especializados de ingeniería y ciencias aplicadas.</p>
+    </div>
+    <div class="col-lg-5 text-lg-end mt-3 mt-lg-0">
+        <div class="d-inline-flex align-items-center bg-white p-2 px-3 rounded-pill shadow-sm border">
+            <i class="fas fa-layer-group text-accent me-2"></i>
+            <span class="fw-bold text-white me-2">@Model.Count</span>
+            <span class="text-muted small">Ejemplares registrados</span>
+        </div>
+    </div>
+</div>
+
+<!-- Grid de Catálogo -->
+<div class="row g-4">
+    @for (int i = 0; i < Model.Count; i++)
+    {
+        var l = Model[i];
+        var percentage = l.CantidadTotal > 0 ? (l.CantidadDisponible * 100) / l.CantidadTotal : 0;
+        var barColor = percentage > 50 ? "#22c55e" : (percentage > 20 ? "#f59e0b" : "#ef4444");
+
+        <div class="col-xl-4 col-md-6 fade-in-up" style="animation-delay: @(i * 0.05)s">
+            <div class="card card-libro h-100 border-0 shadow-sm">
+                <div class="row g-0 h-100">
+                    <!-- Área de Imagen -->
+                    <div class="col-4 portada-aside overflow-hidden">
+                        @if (!string.IsNullOrEmpty(l.ImagenUrl))
+                        {
+                            <img src="@l.ImagenUrl" class="img-portada" alt="Portada">
+                        }
+                        else
+                        {
+                            <div class="h-100 d-flex flex-column align-items-center justify-content-center text-muted opacity-25 p-3">
+                                <i class="fas fa-book-open fa-3x mb-2"></i>
+                                <span class="extra-small fw-bold">SIN INFO</span>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Contenido Informativo -->
+                    <div class="col-8">
+                        <div class="card-body d-flex flex-column h-100 p-4">
+                            <div class="mb-2">
+                                <span class="badge badge-category rounded-pill px-2 py-1 text-uppercase fw-800">
+                                    @(l.Categoria?.Nombre ?? "General")
+                                </span>
+                            </div>
+
+                            <h5 class="card-title fw-800 text-white mb-1 text-limit-2">@l.Titulo</h5>
+                            <p class="small text-muted mb-4"><i class="fas fa-user-edit me-1"></i> @(l.Autor?.Nombre ?? "Anónimo")</p>
+
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-end mb-1">
+                                    <span class="extra-small fw-bold text-muted text-uppercase">Disponibilidad</span>
+                                    <span class="small fw-800 @(l.CantidadDisponible > 0 ? "text-success" : "text-danger")">
+                                        @l.CantidadDisponible / @l.CantidadTotal
+                                    </span>
+                                </div>
+
+                                <!-- Barra de Progreso Visual -->
+                                <div class="stock-bar-container mb-4">
+                                    <div class="stock-bar-fill" style="width: @percentage%; background: @barColor;"></div>
+                                </div>
+
+                                <a asp-action="Detalle" asp-route-id="@l.Id" class="btn btn-dark btn-sm w-100 rounded-pill fw-bold py-2 shadow-sm transition-all">
+                                    <i class="fas fa-chevron-right me-1"></i> Explorar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

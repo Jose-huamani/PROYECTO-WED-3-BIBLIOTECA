@@ -1,0 +1,252 @@
+@model List<MultaDto>
+
+<style>
+    :root {
+        --dark-dark: #0a0a0a;
+        --accent-cyan: #8b5cf6;
+        --glow-cyan: rgba(0, 204, 205, 0.3);
+        --glass-bg: rgba(255, 255, 255, 0.8);
+    }
+
+    /* --- CONTENEDOR PRINCIPAL --- */
+    .finance-shell {
+        background: #f8fafc;
+        min-height: 100vh;
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* --- HEADER PREMIUM --- */
+    .header-premium {
+        background: linear-gradient(135deg, var(--dark-dark) 0%, #171717 100%);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* --- ANIMACIÓN CORREGIDA --- */
+    @@keyframes customFadeInUp {
+        0% {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+            backface-visibility: hidden;
+        }
+    }
+
+    .fade-in-row {
+        opacity: 0; /* Estado inicial para la animación */
+        animation: customFadeInUp 0.5s ease-out forwards;
+    }
+
+    /* --- TARJETAS DE ESTADÍSTICAS --- */
+    .stat-card {
+        border: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.08) !important;
+        }
+
+    .ls-2 {
+        letter-spacing: 2px;
+    }
+
+    .text-accent {
+        color: var(--accent-cyan);
+    }
+
+    /* --- TABLA GLASSMORPHISM --- */
+    .table-container-glass {
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+    }
+
+    .custom-table thead th {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: #64748b;
+        background: rgba(241, 245, 249, 0.5);
+        border: none;
+        padding: 1.2rem 1rem;
+    }
+
+    .custom-table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.9) !important;
+        box-shadow: inset 4px 0 0 var(--accent-cyan);
+    }
+
+    /* --- ESTADOS Y BOTONES --- */
+    .status-pill {
+        padding: 5px 14px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+        .status-pill.ok {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .status-pill.danger {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+    .btn-dark-accent {
+        background: var(--dark-dark);
+        color: var(--accent-cyan);
+        border: none;
+        transition: 0.3s;
+    }
+
+        .btn-dark-accent:hover {
+            background: var(--accent-cyan);
+            color: var(--dark-dark);
+            box-shadow: 0 0 15px var(--glow-cyan);
+        }
+</style>
+
+<div class="finance-shell">
+    <section class="container py-5">
+        <!-- Header -->
+        <div class="header-premium p-4 p-md-5 mb-4 rounded-5 shadow-lg d-flex justify-content-between align-items-center">
+            <div class="ps-3 text-white">
+                <span class="text-accent small fw-bold ls-2">CONTROL FINANCIERO</span>
+                <h1 class="display-6 fw-800 mb-0">Multas Automáticas</h1>
+            </div>
+            <div>
+                <a asp-action="Dashboard" class="btn btn-outline-light rounded-pill px-4 fw-bold opacity-75">
+                    <i class="fas fa-arrow-left me-2"></i>Volver
+                </a>
+            </div>
+        </div>
+
+        <!-- Indicadores -->
+        <div class="row g-4 mb-5 text-center">
+            <div class="col-md-4">
+                <div class="card stat-card border-0 shadow-sm rounded-5 bg-white p-4 border-bottom border-danger border-4">
+                    <span class="text-muted small fw-bold ls-2">PULSO DE MORA</span>
+                    <h2 class="display-5 fw-800 text-danger my-2">@Model.Count(m => !m.Pagada)</h2>
+                    <p class="extra-small text-muted mb-0">Cuentas Pendientes</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card stat-card border-0 shadow-lg rounded-5 bg-dark-dark text-white p-4">
+                    <span class="text-accent small fw-bold ls-2">PROYECCIÓN</span>
+                    <h2 class="display-5 fw-800 my-2">@Model.Where(m => !m.Pagada).Sum(m => m.Monto) <small class="h6">Bs</small></h2>
+                    <p class="extra-small mb-0 opacity-50">Ingreso por Recaudar</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card stat-card border-0 shadow-sm rounded-5 bg-white p-4 border-bottom border-success border-4">
+                    <span class="text-success small fw-bold ls-2">LIQUIDADO</span>
+                    <h2 class="display-5 fw-800 text-white-dark my-2">@Model.Count(m => m.Pagada)</h2>
+                    <p class="extra-small text-muted mb-0">Pagos Confirmados</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="card border-0 shadow-lg rounded-5 overflow-hidden table-container-glass">
+            <div class="table-responsive">
+                <table class="table align-middle custom-table mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Usuario</th>
+                            <th>Concepto / Fecha</th>
+                            <th class="text-center">Monto</th>
+                            <th class="text-center">Estado</th>
+                            <th class="pe-4 text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Count; i++)
+                        {
+                            var m = Model[i];
+                            <tr class="fade-in-row" style="animation-delay: @(i * 0.08)s">
+                                <td class="ps-4 py-4">
+                                    <div class="fw-bold text-white-dark">@m.Usuario?.NombreCompleto</div>
+                                    <div class="extra-small text-primary fw-bold">PRÉSTAMO #@m.PrestamoId</div>
+                                </td>
+                                <td>
+                                    <div class="fw-medium">@m.Motivo</div>
+                                    <div class="extra-small text-muted">@m.FechaGeneracion.ToString("dd/MM/yyyy HH:mm")</div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="fw-800 h5">@m.Monto Bs</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="status-pill @(m.Pagada ? "ok" : "danger")">
+                                        @(m.Pagada ? "Pagada" : "En Mora")
+                                    </span>
+                                </td>
+                                <td class="pe-4 text-end">
+                                    @if (!m.Pagada)
+                                    {
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <form asp-action="PagarMulta" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@m.Id" />
+                                                <button type="submit" class="btn btn-dark-accent btn-sm rounded-pill px-4 fw-bold">
+                                                    COBRAR
+                                                </button>
+                                            </form>
+                                            <button class="btn btn-outline-info btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#notifModal-@m.Id">
+                                                <i class="fas fa-bell"></i>
+                                            </button>
+                                        </div>
+
+                                        <!-- Modal Notificación -->
+                                        <div class="modal fade" id="notifModal-@m.Id" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content rounded-5 border-0 shadow-lg overflow-hidden">
+                                                    <form asp-action="EnviarNotificacion" method="post">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="UsuarioId" value="@m.UsuarioId" />
+                                                        <input type="hidden" name="returnUrl" value="~/Admin/Multas" />
+                                                        <div class="modal-header border-0 bg-dark-dark text-white p-4">
+                                                            <h5 class="modal-title fw-bold text-accent">Notificar Cobro</h5>
+                                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <div class="modal-body p-4 bg-light text-start">
+                                                            <div class="mb-3">
+                                                                <label class="form-label fw-bold small text-muted">ASUNTO</label>
+                                                                <input type="text" name="Titulo" class="form-control border-0 shadow-sm" value="Multa Pendiente" required />
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label fw-bold small text-muted">MENSAJE</label>
+                                                                <textarea name="Mensaje" class="form-control border-0 shadow-sm" rows="3" required>Hola @m.Usuario?.NombreCompleto, tienes una multa de @m.Monto Bs por el préstamo #@m.PrestamoId.</textarea>
+                                                            </div>
+                                                            <input type="hidden" name="Tipo" value="Cobranza" />
+                                                        </div>
+                                                        <div class="modal-footer border-0 bg-light p-4">
+                                                            <button type="button" class="btn btn-white rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Cerrar</button>
+                                                            <button type="submit" class="btn btn-dark-accent rounded-pill px-4 fw-bold">Enviar Push</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-check-double text-success h5 mb-0" title="Liquidado"></i>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</div>

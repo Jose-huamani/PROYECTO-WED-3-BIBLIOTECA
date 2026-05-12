@@ -1,0 +1,210 @@
+@{
+    ViewData["Title"] = "Terminal de Pagos";
+}
+
+<div class="container py-5 animate__animated animate__fadeIn">
+    <div class="card border-0 shadow-lg rounded-5 overflow-hidden bg-gradient-dark mb-4">
+        <div class="card-body p-4 p-md-5 d-flex justify-content-between align-items-center">
+            <div>
+                <div class="d-flex align-items-center mb-2">
+                    <div class="pulse-indicator me-2"></div>
+                    <span class="text-accent fw-bold small ls-2 text-uppercase">Terminal Punto de Venta</span>
+                </div>
+                <h1 class="display-6 fw-800 text-white mb-0">Sistema de Pagos</h1>
+                <p class="text-white-50 mb-0 small">Procesamiento de transacciones seguras y emisión de comprobantes.</p>
+            </div>
+            <div class="text-end d-none d-md-block">
+                <span class="d-block text-white-50 small">Sesión de Caja</span>
+                <span class="badge bg-blur text-accent border border-accent-soft px-3 py-2 mt-1">Activa - Bs. 0.00</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="row g-3">
+                @{
+                    var metodos = new[] {
+                                new { T = "Registrar Efectivo", I = "fa-money-bill-wave", C = "text-success", D = "Cobro físico y cálculo de cambio." },
+                                new { T = "Generar Pago QR", I = "fa-qrcode", C = "text-primary", D = "Integración con banca móvil." },
+                                new { T = "Confirmar Transacción", I = "fa-file-signature", C = "text-warning", D = "Verificar transferencias bancarias." },
+                                new { T = "Venta por Tarjeta", I = "fa-credit-card", C = "text-info", D = "Procesar débito o crédito." }
+                                };
+                }
+
+                @foreach (var m in metodos)
+                {
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm rounded-4 h-100 card-method-hover">
+                            <div class="card-body p-4">
+                                <div class="icon-box-medium bg-light rounded-3 mb-3">
+                                    <i class="fas @m.I @m.C fa-lg"></i>
+                                </div>
+                                <h5 class="fw-bold text-white">@m.T</h5>
+                                <p class="extra-small text-muted mb-0">@m.D</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-lg rounded-5 bg-white h-100 overflow-hidden">
+                <div class="card-header bg-dark text-white py-4 text-center">
+                    <h6 class="mb-0 fw-bold"><i class="fas fa-receipt me-2 text-accent"></i>Documentos y Comprobantes</h6>
+                </div>
+                <div class="card-body p-4">
+                    <div class="vstack gap-3">
+                        <button class="btn btn-light-soft w-100 py-3 rounded-4 d-flex align-items-center px-3">
+                            <i class="fas fa-print me-3 text-white"></i>
+                            <div class="text-start">
+                                <span class="d-block fw-bold small">Imprimir Ticket</span>
+                                <span class="extra-small text-muted">Impresora térmica</span>
+                            </div>
+                        </button>
+
+                        <button class="btn btn-light-soft w-100 py-3 rounded-4 d-flex align-items-center px-3">
+                            <i class="fas fa-file-pdf me-3 text-danger"></i>
+                            <div class="text-start">
+                                <span class="d-block fw-bold small">Exportar Factura</span>
+                                <span class="extra-small text-muted">Formato PDF Digital</span>
+                            </div>
+                        </button>
+
+                        <div class="divider-text my-2 small text-muted">Utilidades de Caja</div>
+
+                        <button class="btn btn-dark-accent w-100 py-3 rounded-pill fw-bold shadow-sm">
+                            <i class="fas fa-calculator me-2"></i>Calcular Cambio
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-deep: #423A8E;
+        --accent-cyan: #8b5cf6;
+        --dark-dark: #171717;
+    }
+
+    /* ELEMENTOS VISUALES */
+    .bg-gradient-dark {
+        background: linear-gradient(135deg, #0a0a0a 0%, #171717 100%);
+    }
+
+    .bg-dark {
+        background: #0a0a0a;
+    }
+
+    .text-accent {
+        color: var(--accent-cyan) !important;
+    }
+
+    .bg-blur {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+    }
+
+    .pulse-indicator {
+        width: 10px;
+        height: 10px;
+        background: #10b981;
+        border-radius: 50%;
+        box-shadow: 0 0 0 rgba(16, 185, 129, 0.4);
+        animation: pulse-green 2s infinite;
+    }
+
+    @@keyframes pulse-green {
+        0% {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+        }
+
+        70% {
+            box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+        }
+    }
+
+    /* CARDS */
+    .card-method-hover {
+        transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        cursor: pointer;
+        border: 1px solid #f1f5f9 !important;
+    }
+
+        .card-method-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;
+            border-color: var(--accent-cyan) !important;
+        }
+
+    .icon-box-medium {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-light-soft {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        transition: 0.3s;
+    }
+
+        .btn-light-soft:hover {
+            background: #ffffff;
+            border-color: var(--primary-deep);
+        }
+
+    .btn-dark-accent {
+        background: var(--dark-dark);
+        color: white;
+        border: none;
+        transition: 0.3s;
+    }
+
+        .btn-dark-accent:hover {
+            background: var(--accent-cyan);
+            color: var(--dark-dark);
+        }
+
+    .extra-small {
+        font-size: 0.75rem;
+    }
+
+    .fw-800 {
+        font-weight: 800;
+    }
+
+    .ls-2 {
+        letter-spacing: 2px;
+    }
+
+    .divider-text {
+        display: flex;
+        align-items: center;
+        text-align: center;
+    }
+
+        .divider-text::before, .divider-text::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .divider-text:not(:empty)::before {
+            margin-right: .5em;
+        }
+
+        .divider-text:not(:empty)::after {
+            margin-left: .5em;
+        }
+</style>

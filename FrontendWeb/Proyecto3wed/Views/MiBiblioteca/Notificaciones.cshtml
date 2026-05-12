@@ -1,0 +1,69 @@
+﻿@model List<NotificacionDto>
+@{
+    ViewData["Title"] = "Mis Notificaciones";
+}
+
+<style>
+    .notif-shell { background: #f8fafc; min-height: 100vh; padding-bottom: 4rem; }
+    .notif-header {
+        background: linear-gradient(135deg, #0369a1 0%, #0ea5e9 100%);
+        color: white; padding: 3rem 2rem;
+        border-radius: 0 0 2.5rem 2.5rem; margin-bottom: 2rem;
+    }
+    .notif-card {
+        background: white; border-radius: 1.25rem; border: 1px solid #e2e8f0;
+        margin-bottom: 1rem; transition: 0.3s; overflow: hidden;
+    }
+    .notif-card:hover { transform: scale(1.01); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+    .notif-unread { border-left: 6px solid #0ea5e9; background: #f0f9ff; }
+    .notif-read { opacity: 0.7; }
+    .notif-icon {
+        width: 45px; height: 45px; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+    }
+</style>
+
+<div class="notif-shell">
+    <div class="notif-header">
+        <div class="container">
+            <h1 class="fw-bold mb-1"><i class="fas fa-bell me-2"></i> Centro de Notificaciones</h1>
+            <p class="opacity-75 mb-0">Mantente al tanto de tus prestamos, reservas y multas.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                @if (Model != null && Model.Any()) {
+                    @foreach (var n in Model) {
+                        <div class="notif-card p-3 @(n.Leida ? "notif-read" : "notif-unread") d-flex align-items-center gap-3">
+                            <div class="notif-icon" style="background:@(n.Leida ? "#f1f5f9" : "#e0f2fe"); color:@(n.Leida ? "#64748b" : "#0ea5e9");">
+                                <i class="fas @(n.Leida ? "fa-envelope-open" : "fa-envelope")"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <h6 class="fw-bold mb-1 text-dark">@n.Titulo</h6>
+                                    <small class="text-muted">@n.FechaCreacion.ToString("dd/MM HH:mm")</small>
+                                </div>
+                                <p class="text-muted small mb-0">@n.Mensaje</p>
+                            </div>
+                            @if (!n.Leida) {
+                                <form asp-action="MarcarLeida" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@n.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill px-3">Marcar leida</button>
+                                </form>
+                            }
+                        </div>
+                    }
+                } else {
+                    <div class="text-center py-5 bg-white rounded-4 border">
+                        <i class="fas fa-bell-slash fa-4x text-muted opacity-25 mb-3"></i>
+                        <h5 class="fw-bold text-dark">No tienes notificaciones</h5>
+                        <p class="text-muted">Te avisaremos cuando haya novedades importantes.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

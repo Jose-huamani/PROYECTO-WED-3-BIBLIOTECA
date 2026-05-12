@@ -1,0 +1,67 @@
+﻿@model List<FavoritoDto>
+@{
+    ViewData["Title"] = "Mis Favoritos";
+}
+
+<style>
+    .fav-shell { background: #f8fafc; min-height: 100vh; padding-bottom: 4rem; }
+    .fav-header {
+        background: linear-gradient(135deg, #f43f5e 0%, #fb7185 100%);
+        color: white; padding: 3rem 2rem;
+        border-radius: 0 0 2.5rem 2.5rem; margin-bottom: 2rem;
+    }
+    .book-fav-card {
+        background: white; border-radius: 1.5rem; border: 1px solid #e2e8f0;
+        overflow: hidden; transition: 0.3s;
+    }
+    .book-fav-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(244, 63, 94, 0.1); border-color: #f43f5e; }
+    .fav-img { width: 100%; height: 180px; object-fit: cover; }
+</style>
+
+<div class="fav-shell">
+    <div class="fav-header">
+        <div class="container">
+            <h1 class="fw-bold mb-1"><i class="fas fa-heart me-2"></i> Mis Libros Favoritos</h1>
+            <p class="opacity-75 mb-0">Tu lista personalizada de libros que mas te gustan.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        @if (Model != null && Model.Any()) {
+            <div class="row g-4">
+                @foreach (var f in Model) {
+                    <div class="col-lg-3 col-md-6">
+                        <div class="book-fav-card">
+                            @if (!string.IsNullOrEmpty(f.Libro?.ImagenUrl)) {
+                                <img src="@f.Libro.ImagenUrl" class="fav-img" alt="Portada">
+                            } else {
+                                <div class="bg-light d-flex align-items-center justify-content-center" style="height:180px;">
+                                    <i class="fas fa-book fa-3x text-muted opacity-25"></i>
+                                </div>
+                            }
+                            <div class="p-3 text-center">
+                                <h6 class="fw-bold text-dark mb-1 text-truncate">@(f.Libro?.Titulo ?? "Sin Titulo")</h6>
+                                <p class="text-muted small mb-3">@(f.Libro?.Autor?.Nombre ?? "Autor desconocido")</p>
+                                <div class="d-flex gap-2">
+                                    <a href="/Catalogo/Detalle/@f.LibroId" class="btn btn-sm btn-primary rounded-pill flex-grow-1 fw-bold">Ver mas</a>
+                                    <form asp-action="QuitarFavorito" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="libroId" value="@f.LibroId" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" title="Eliminar"><i class="fas fa-trash-alt"></i></button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        } else {
+            <div class="text-center py-5 bg-white rounded-4 border">
+                <i class="fas fa-heart-broken fa-4x text-muted opacity-25 mb-3"></i>
+                <h5 class="fw-bold text-dark">No tienes libros favoritos aun</h5>
+                <p class="text-muted">Explora el catalogo y pulsa el ❤️ para guardar libros.</p>
+                <a href="/Catalogo/Index" class="btn btn-primary rounded-pill px-4 mt-2">Ir al Catalogo</a>
+            </div>
+        }
+    </div>
+</div>

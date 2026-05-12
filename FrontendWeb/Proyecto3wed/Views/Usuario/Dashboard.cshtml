@@ -1,0 +1,216 @@
+@{
+    ViewData["Title"] = "Inicio";
+    var userName = ViewBag.UserName ?? "Usuario";
+    var prestamos = (List<Proyecto3wed.Models.PrestamoDto>?)ViewBag.Prestamos ?? new();
+    var reservas = (List<Proyecto3wed.Models.ReservaDto>?)ViewBag.Reservas ?? new();
+    var multas = (List<Proyecto3wed.Models.MultaDto>?)ViewBag.Multas ?? new();
+    var ventas = (List<Proyecto3wed.Models.VentaDto>?)ViewBag.Ventas ?? new();
+    
+    var librosDestacados = (List<Proyecto3wed.Models.LibroDto>?)ViewBag.LibrosDestacados ?? new();
+    var librosPopulares = (List<Proyecto3wed.Models.LibroDto>?)ViewBag.LibrosPopulares ?? new();
+
+    int puntos = (prestamos.Count * 10) + (ventas.Count * 20); // Dummy gamification calculation
+}
+
+<style>
+    .user-dashboard {
+        font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .hero-user {
+        background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(15, 23, 42, 0) 100%);
+        border-radius: 24px;
+        padding: 40px;
+        border: 1px solid rgba(14, 165, 233, 0.2);
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-user::before {
+        content: "";
+        position: absolute;
+        top: -50px;
+        right: -50px;
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(circle, rgba(14, 165, 233, 0.2) 0%, transparent 70%);
+        border-radius: 50%;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 20px;
+        padding: 20px;
+        border: 1px solid rgba(0,0,0,0.05);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+        transition: all 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    /* Soporte para Dark Mode a futuro mediante clases o variables */
+    @@media (prefers-color-scheme: dark) {
+        body { background-color: #0f172a; color: #f8fafc; }
+        .stat-card { background: #1e293b; border-color: rgba(255,255,255,0.05); }
+        .text-dark { color: #f8fafc !important; }
+        .bg-light { background-color: #1e293b !important; }
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+        border-color: rgba(14, 165, 233, 0.3);
+    }
+
+    .stat-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+
+    .book-card-mini {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.05);
+        transition: transform 0.3s;
+    }
+    
+    .book-card-mini:hover {
+        transform: translateY(-3px);
+        border-color: rgba(14, 165, 233, 0.3);
+    }
+
+    .book-card-mini img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+    }
+
+    @@media (prefers-color-scheme: dark) {
+        .book-card-mini { background: #1e293b; border-color: rgba(255,255,255,0.05); }
+    }
+</style>
+
+<div class="container user-dashboard animate__animated animate__fadeIn py-4">
+    
+    <!-- HERO SECCIÓN -->
+    <div class="hero-user d-flex flex-column flex-md-row align-items-center justify-content-between">
+        <div class="d-flex align-items-center mb-4 mb-md-0">
+            <img src="https://ui-avatars.com/api/?name=@userName&background=0ea5e9&color=fff&size=100" class="rounded-circle shadow me-4" alt="Foto Perfil" style="border: 4px solid white;">
+            <div>
+                <h1 class="display-6 fw-bold mb-1">👋 ¡Hola, @userName!</h1>
+                <p class="text-muted mb-0 fs-5">Bienvenido de vuelta a tu espacio personal.</p>
+            </div>
+        </div>
+        <div class="text-center text-md-end">
+            <div class="d-inline-flex align-items-center bg-white (prefers-color-scheme: dark) bg-dark rounded-pill p-2 pe-4 shadow-sm border">
+                <div class="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 40px; height: 40px;">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0 text-start">@puntos</h5>
+                    <small class="text-muted text-uppercase fw-bold" style="font-size: 0.65rem;">Puntos Totales</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CARDS PRINCIPALES -->
+    <div class="row g-4 mb-5">
+        <div class="col-6 col-lg-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-info bg-opacity-10 text-info">
+                    <i class="fas fa-book-reader"></i>
+                </div>
+                <h2 class="fw-bold mb-1">@prestamos.Count</h2>
+                <p class="text-muted small mb-0 fw-medium">Libros Prestados</p>
+                <a asp-controller="MiBiblioteca" asp-action="Prestamos" class="stretched-link"></a>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                    <i class="fas fa-bookmark"></i>
+                </div>
+                <h2 class="fw-bold mb-1">@reservas.Count</h2>
+                <p class="text-muted small mb-0 fw-medium">Reservas Activas</p>
+                <a asp-controller="MiBiblioteca" asp-action="Reservas" class="stretched-link"></a>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-danger bg-opacity-10 text-danger">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                </div>
+                <h2 class="fw-bold mb-1">@multas.Count(m => !m.Pagada)</h2>
+                <p class="text-muted small mb-0 fw-medium">Multas Pendientes</p>
+                <a asp-controller="MiBiblioteca" asp-action="Multas" class="stretched-link"></a>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-success bg-opacity-10 text-success">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <h2 class="fw-bold mb-1">@ventas.Count</h2>
+                <p class="text-muted small mb-0 fw-medium">Compras Realizadas</p>
+                <a asp-controller="Usuario" asp-action="MisVentas" class="stretched-link"></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN LIBROS -->
+    <div class="row g-5">
+        <div class="col-md-6">
+            <div class="d-flex justify-content-between align-items-end mb-4">
+                <h4 class="fw-bold mb-0"><i class="fas fa-star text-warning me-2"></i> Destacados</h4>
+                <a asp-controller="Catalogo" asp-action="Index" class="btn btn-link text-decoration-none p-0 fw-medium">Ver todos <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+            <div class="row g-3">
+                @foreach (var libro in librosDestacados)
+                {
+                    <div class="col-6">
+                        <div class="book-card-mini h-100 position-relative">
+                            <img src="@(string.IsNullOrEmpty(libro.ImagenUrl) ? "/img/placeholder.jpg" : libro.ImagenUrl)" alt="@libro.Titulo">
+                            <div class="p-3">
+                                <h6 class="fw-bold text-truncate mb-1">@libro.Titulo</h6>
+                                <p class="small text-muted mb-0 text-truncate">@libro.Autor?.Nombre</p>
+                            </div>
+                            <a asp-controller="Catalogo" asp-action="Detalle" asp-route-id="@libro.Id" class="stretched-link"></a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="d-flex justify-content-between align-items-end mb-4">
+                <h4 class="fw-bold mb-0"><i class="fas fa-fire text-danger me-2"></i> Populares</h4>
+                <a asp-controller="Catalogo" asp-action="Index" class="btn btn-link text-decoration-none p-0 fw-medium">Explorar <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+            <div class="row g-3">
+                @foreach (var libro in librosPopulares)
+                {
+                    <div class="col-6">
+                        <div class="book-card-mini h-100 position-relative">
+                            <img src="@(string.IsNullOrEmpty(libro.ImagenUrl) ? "/img/placeholder.jpg" : libro.ImagenUrl)" alt="@libro.Titulo">
+                            <div class="p-3">
+                                <h6 class="fw-bold text-truncate mb-1">@libro.Titulo</h6>
+                                <p class="small text-muted mb-0 text-truncate">@libro.Autor?.Nombre</p>
+                            </div>
+                            <a asp-controller="Catalogo" asp-action="Detalle" asp-route-id="@libro.Id" class="stretched-link"></a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

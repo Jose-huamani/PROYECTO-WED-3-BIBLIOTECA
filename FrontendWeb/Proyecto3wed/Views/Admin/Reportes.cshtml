@@ -1,0 +1,214 @@
+@{
+    ViewData["Title"] = "Centro de Reportes";
+}
+
+<style>
+    .reportes-shell { background: #f8fafc; min-height: 100vh; padding-bottom: 4rem; }
+    .reportes-header {
+        background: linear-gradient(135deg, #0f172a 0%, #164e63 60%, #0369a1 100%);
+        color: white; padding: 3rem 2rem;
+        border-radius: 0 0 3rem 3rem;
+        margin-bottom: 2.5rem;
+    }
+    .report-card {
+        background: white; border-radius: 1.5rem;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+        transition: all 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
+        height: 100%;
+    }
+    .report-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(14, 165, 233, 0.15);
+        border-color: #0ea5e9;
+    }
+    .report-icon {
+        width: 72px; height: 72px; border-radius: 1.2rem;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.8rem;
+        transition: 0.3s;
+    }
+    .report-card:hover .report-icon { transform: scale(1.1) rotate(-5deg); }
+    .btn-report {
+        border-radius: 50px; font-weight: 700; padding: 0.6rem 1.5rem;
+        transition: 0.3s;
+    }
+    .btn-report:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.15); }
+    .stat-badge {
+        background: #f0f9ff; border: 1px solid #bae6fd;
+        color: #0369a1; border-radius: 50px;
+        padding: 0.25rem 0.75rem; font-size: 0.75rem; font-weight: 700;
+    }
+    .quick-export {
+        background: white; border-radius: 1.5rem;
+        border: 1px solid #e2e8f0; padding: 1.5rem;
+    }
+</style>
+
+<div class="reportes-shell">
+    <!-- Header -->
+    <div class="reportes-header">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <div>
+                    <span class="badge bg-info text-white fw-bold mb-2 px-3">BUSINESS INTELLIGENCE</span>
+                    <h1 class="fw-bold display-6 mb-1"><i class="fas fa-chart-bar me-3"></i>Centro de Reportes</h1>
+                    <p class="opacity-75 mb-0">Exporta y analiza datos en tiempo real del sistema bibliotecario.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a asp-action="Dashboard" class="btn btn-outline-light rounded-pill px-4">
+                        <i class="fas fa-home me-2"></i>Panel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Exportación Rápida -->
+        <div class="quick-export mb-4 shadow-sm">
+            <div class="row align-items-center g-3">
+                <div class="col-auto">
+                    <div class="bg-primary-subtle p-3 rounded-3">
+                        <i class="fas fa-bolt text-primary fa-lg"></i>
+                    </div>
+                </div>
+                <div class="col">
+                    <h6 class="fw-bold text-dark mb-0">Exportación Rápida de Libros</h6>
+                    <p class="text-muted small mb-0">Descarga el catálogo completo instantáneamente</p>
+                </div>
+                <div class="col-auto d-flex gap-2 flex-wrap">
+                    <a asp-action="ExportarLibrosExcel" class="btn btn-success btn-sm rounded-pill px-3 fw-bold">
+                        <i class="fas fa-file-excel me-1"></i> Excel
+                    </a>
+                    <a asp-action="ExportarLibrosPdf" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold">
+                        <i class="fas fa-file-pdf me-1"></i> PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid de Reportes -->
+        <div class="row g-4">
+            <!-- Préstamos -->
+            <div class="col-md-6 col-lg-4">
+                <div class="report-card">
+                    <div class="p-4">
+                        <div class="d-flex align-items-start justify-content-between mb-3">
+                            <div class="report-icon bg-success-subtle">
+                                <i class="fas fa-file-excel text-success"></i>
+                            </div>
+                            <span class="stat-badge">Excel</span>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-1">Reporte Préstamos</h5>
+                        <p class="text-muted small mb-4">Historial completo de préstamos activos, devueltos y retrasados con fechas y multas generadas.</p>
+                        <a asp-action="ReportePrestamos" class="btn btn-success btn-report w-100">
+                            <i class="fas fa-download me-2"></i> Descargar Reporte
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Multas -->
+            <div class="col-md-6 col-lg-4">
+                <div class="report-card">
+                    <div class="p-4">
+                        <div class="d-flex align-items-start justify-content-between mb-3">
+                            <div class="report-icon bg-danger-subtle">
+                                <i class="fas fa-gavel text-danger"></i>
+                            </div>
+                            <span class="stat-badge">Lista</span>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-1">Reporte Multas</h5>
+                        <p class="text-muted small mb-4">Todas las multas pendientes y pagadas, con montos, usuarios responsables y fechas de vencimiento.</p>
+                        <a asp-action="Multas" class="btn btn-danger btn-report w-100">
+                            <i class="fas fa-eye me-2"></i> Ver Multas
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Usuarios -->
+            <div class="col-md-6 col-lg-4">
+                <div class="report-card">
+                    <div class="p-4">
+                        <div class="d-flex align-items-start justify-content-between mb-3">
+                            <div class="report-icon bg-warning-subtle">
+                                <i class="fas fa-users text-warning"></i>
+                            </div>
+                            <span class="stat-badge">Directorio</span>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-1">Reporte Usuarios</h5>
+                        <p class="text-muted small mb-4">Listado de lectores registrados, su estado, puntos de gamificación, préstamos activos y rol asignado.</p>
+                        <a asp-action="Usuarios" class="btn btn-warning btn-report w-100">
+                            <i class="fas fa-eye me-2"></i> Ver Usuarios
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ventas -->
+            <div class="col-md-6 col-lg-4">
+                <div class="report-card">
+                    <div class="p-4">
+                        <div class="d-flex align-items-start justify-content-between mb-3">
+                            <div class="report-icon bg-info-subtle">
+                                <i class="fas fa-cash-register text-info"></i>
+                            </div>
+                            <span class="stat-badge">Financiero</span>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-1">Reporte Ventas</h5>
+                        <p class="text-muted small mb-4">Historial completo de ventas de libros, ingresos totales, métodos de pago utilizados y comprobantes generados.</p>
+                        <a asp-action="Ventas" class="btn btn-info btn-report w-100 text-white">
+                            <i class="fas fa-eye me-2"></i> Ver Ventas
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gamificación / Ranking -->
+            <div class="col-md-6 col-lg-4">
+                <div class="report-card">
+                    <div class="p-4">
+                        <div class="d-flex align-items-start justify-content-between mb-3">
+                            <div class="report-icon bg-purple-subtle" style="background: #faf5ff;">
+                                <i class="fas fa-trophy" style="color: #7c3aed;"></i>
+                            </div>
+                            <span class="stat-badge">Ranking</span>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-1">Gamificación</h5>
+                        <p class="text-muted small mb-4">Tabla de posiciones de lectores, puntos acumulados, medallas obtenidas y el usuario más activo del mes.</p>
+                        <a asp-action="Gamificacion" class="btn btn-report w-100 fw-bold" style="background: #7c3aed; color: white;">
+                            <i class="fas fa-eye me-2"></i> Ver Ranking
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Auditoría -->
+            <div class="col-md-6 col-lg-4">
+                <div class="report-card">
+                    <div class="p-4">
+                        <div class="d-flex align-items-start justify-content-between mb-3">
+                            <div class="report-icon bg-secondary-subtle">
+                                <i class="fas fa-history text-secondary"></i>
+                            </div>
+                            <span class="stat-badge">Trazabilidad</span>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-1">Auditoría del Sistema</h5>
+                        <p class="text-muted small mb-4">Registro detallado de todas las acciones realizadas en el sistema: usuario, módulo, fecha y hora exacta.</p>
+                        <a asp-action="Auditoria" class="btn btn-secondary btn-report w-100">
+                            <i class="fas fa-eye me-2"></i> Ver Auditoría
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Informativo -->
+        <div class="mt-4 p-3 bg-white rounded-3 border text-center shadow-sm">
+            <i class="fas fa-info-circle text-primary me-2"></i>
+            <span class="text-muted small">Los reportes se generan en tiempo real. La información de ventas y préstamos refleja el estado actual de la base de datos.</span>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,269 @@
+@model List<AdminUsuarioDto>
+@{
+    ViewData["Title"] = "Gestión de Empleados y Personal";
+}
+
+<style>
+    :root {
+        --primary-deep: #423A8E;
+        --accent-cyan: #8b5cf6;
+        --dark-dark: #0a0a0a;
+        --slate-100: #f1f5f9;
+        --glow-cyan: rgba(0, 204, 205, 0.3);
+    }
+
+    .bg-gradient-dark {
+        background: linear-gradient(135deg, var(--dark-dark) 0%, #171717 100%);
+    }
+
+    /* --- FORMULARIOS FLOATING REFINADOS --- */
+    .form-floating > .form-control {
+        background-color: white !important;
+        border: 1px solid #e2e8f0 !important;
+        transition: all 0.3s ease;
+    }
+
+        .form-floating > .form-control:focus {
+            border-color: var(--accent-cyan) !important;
+            box-shadow: 0 0 0 4px var(--glow-cyan) !important;
+        }
+
+    /* --- AVATARES --- */
+    .avatar-circle {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 1.1rem;
+        transition: transform 0.3s ease;
+    }
+
+    tr:hover .avatar-circle {
+        transform: scale(1.1) rotate(-5deg);
+    }
+
+    .bg-primary-soft {
+        background: #eef2ff;
+        color: #4338ca;
+        border: 1px solid #e0e7ff;
+    }
+
+    .bg-danger-soft {
+        background: #fef2f2;
+        color: #dc2626;
+        border: 1px solid #fee2e2;
+    }
+
+    /* --- TABLA --- */
+    .custom-table thead th {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #64748b;
+        background: #f8fafc;
+        border: none;
+        padding: 1rem;
+    }
+
+    .custom-table tbody tr {
+        transition: all 0.2s;
+    }
+
+        .custom-table tbody tr:hover {
+            background-color: #f1f5f9 !important;
+        }
+
+    .metric-item {
+        background: #f1f5f9;
+        padding: 5px 12px;
+        border-radius: 10px;
+        transition: 0.3s;
+    }
+
+        .metric-item:hover {
+            background: var(--dark-dark);
+            color: white;
+        }
+
+    /* --- BOTONES --- */
+    .btn-dark-accent {
+        background-color: var(--dark-dark);
+        color: var(--accent-cyan);
+        border: none;
+        transition: 0.3s;
+    }
+
+        .btn-dark-accent:hover {
+            background-color: var(--accent-cyan);
+            color: var(--dark-dark);
+            box-shadow: 0 8px 20px var(--glow-cyan);
+        }
+
+    .btn-icon-action {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        transition: 0.2s;
+    }
+</style>
+
+<section class="container py-5 animate__animated animate__fadeIn">
+    <div class="header-premium p-4 p-md-5 mb-5 rounded-5 shadow-lg position-relative overflow-hidden bg-gradient-dark">
+        <div class="position-relative z-index-10 text-white">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="icon-shape bg-accent-cyan shadow-sm me-3 rounded-3 p-2" style="width:45px; height:45px; display:flex; align-items:center; justify-content:center;">
+                            <i class="fas fa-id-badge text-dark"></i>
+                        </div>
+                        <span class="text-uppercase fw-bold ls-2 small opacity-75">Administración de Personal</span>
+                    </div>
+                    <h1 class="display-6 fw-800 mb-1">Gestión de Empleados</h1>
+                    <p class="lead opacity-75 mb-0 small">Control de accesos administrativos y permisos de sistema.</p>
+                </div>
+                <a asp-action="Dashboard" class="btn btn-blur rounded-pill px-4">
+                    <i class="fas fa-th-large me-2"></i>Panel Central
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <aside class="col-xl-4">
+            <div class="card border-0 shadow-lg rounded-5 overflow-hidden sticky-top" style="top: 20px;">
+                <div class="card-header bg-dark text-white py-4 text-center">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-user-plus me-2 text-accent"></i>Registrar Nuevo</h5>
+                </div>
+                <div class="card-body p-4 p-md-5 bg-light">
+                    <form asp-action="CrearUsuario" method="post" class="vstack gap-4">
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-floating shadow-sm">
+                            <input class="form-control rounded-4" id="NombreCompleto" name="NombreCompleto" placeholder="Nombre" required />
+                            <label for="NombreCompleto"><i class="fas fa-signature me-2"></i>Nombre Completo</label>
+                        </div>
+
+                        <div class="form-floating shadow-sm">
+                            <input class="form-control rounded-4" id="Email" name="Email" type="email" placeholder="name@example.com" required />
+                            <label for="Email"><i class="fas fa-envelope me-2"></i>Correo Electrónico</label>
+                        </div>
+
+                        <div class="form-floating shadow-sm">
+                            <input class="form-control rounded-4" id="Password" name="Password" type="password" placeholder="Password" required />
+                            <label for="Password"><i class="fas fa-key me-2"></i>Contraseña Temporal</label>
+                        </div>
+
+                        <div>
+                            <label class="form-label fw-bold text-white extra-small ms-2">Nivel de Acceso</label>
+                            <select class="form-select border-0 shadow-sm rounded-4 py-3" name="RolId">
+                                <option value="2">Estudiante / Lector</option>
+                                <option value="3">Bibliotecario</option>
+                                <option value="1">Administrador</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-dark-accent btn-lg rounded-pill fw-bold py-3">
+                            <i class="fas fa-user-check me-2"></i>Crear Cuenta
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </aside>
+
+        <main class="col-xl-8">
+            <div class="card border-0 shadow-lg rounded-5 bg-white h-100">
+                <div class="card-header bg-white py-4 px-4 border-0 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <h5 class="mb-0 fw-bold text-dark">Directorio de Empleados</h5>
+                    <div class="search-box position-relative">
+                        <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                        <input class="form-control border-light bg-light rounded-pill ps-5 py-2 small" id="userFilter" placeholder="Filtrar por nombre o correo..." style="width: 260px;" />
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle custom-table mb-0" id="usersTable">
+                        <thead>
+                            <tr>
+                                <th class="ps-4">Identidad</th>
+                                <th>Rol</th>
+                                <th class="text-center">Estado</th>
+                                <th class="text-center">Métricas</th>
+                                <th class="pe-4 text-end">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var u in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4 py-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle me-3 @(u.Activo ? "bg-primary-soft" : "bg-danger-soft")">
+                                                @u.NombreCompleto.Substring(0, 1).ToUpper()
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-white mb-0" style="font-size: 0.9rem;">@u.NombreCompleto</div>
+                                                <div class="text-muted extra-small">@u.Email</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge rounded-pill bg-white border text-white fw-bold px-3 py-2 small">
+                                            @u.Rol
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="status-pill @(u.Activo ? "ok" : "danger")">
+                                            <i class="fas fa-circle me-1" style="font-size: 0.5rem;"></i>
+                                            @(u.Activo ? "Activo" : "Bloqueado")
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <div class="metric-item" title="Préstamos">
+                                                <i class="fas fa-book-reader text-primary me-1 extra-small"></i> <span class="fw-bold extra-small">@u.PrestamosActivos</span>
+                                            </div>
+                                            <div class="metric-item" title="Puntos">
+                                                <i class="fas fa-star text-warning me-1 extra-small"></i> <span class="fw-bold extra-small">@u.Puntos</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="pe-4 text-end">
+                                        <form asp-action="CambiarEstadoUsuario" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@u.Id" />
+                                            <input type="hidden" name="activo" value="@(!u.Activo)" />
+                                            <button class="btn btn-sm btn-icon-action @(u.Activo ? "btn-outline-danger" : "btn-outline-success") shadow-sm" type="submit">
+                                                <i class="fas @(u.Activo ? "fa-user-lock" : "fa-user-check")"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        const userFilter = document.getElementById('userFilter');
+        const userRows = [...document.querySelectorAll('#usersTable tbody tr')];
+        userFilter?.addEventListener('input', () => {
+            const value = userFilter.value.toLowerCase();
+            userRows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(value) ? '' : 'none';
+                if(text.includes(value)) row.classList.add('animate__animated', 'animate__fadeIn');
+            });
+        });
+    </script>
+}

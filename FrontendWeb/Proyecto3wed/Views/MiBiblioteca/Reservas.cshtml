@@ -1,0 +1,75 @@
+﻿@model List<ReservaDto>
+@{
+    ViewData["Title"] = "Mis Reservas";
+    string NomEstado(int e) => e switch { 1 => "Pendiente", 2 => "Atendida", 3 => "Cancelada", 4 => "Expirada", _ => e.ToString() };
+}
+
+<style>
+    .res-shell { background: #f8fafc; min-height: 100vh; padding-bottom: 4rem; }
+    .res-header {
+        background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+        color: white; padding: 3rem 2rem;
+        border-radius: 0 0 2.5rem 2.5rem; margin-bottom: 2rem;
+    }
+    .res-card {
+        background: white; border-radius: 1.5rem; border: 1px solid #e2e8f0;
+        padding: 1.5rem; margin-bottom: 1rem; transition: 0.3s;
+    }
+    .res-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(124, 58, 237, 0.1); border-color: #7c3aed; }
+    .status-badge { padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+    .st-1 { background: #fef3c7; color: #92400e; } /* Pendiente */
+    .st-2 { background: #dcfce7; color: #15803d; } /* Atendida */
+    .st-3 { background: #fee2e2; color: #991b1b; } /* Cancelada */
+</style>
+
+<div class="res-shell">
+    <div class="res-header">
+        <div class="container">
+            <h1 class="fw-bold mb-1"><i class="fas fa-bookmark me-2"></i> Mis Reservas</h1>
+            <p class="opacity-75 mb-0">Gestiona tus libros apartados para lectura posterior.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        @if (TempData["Msg"] != null) {
+            <div class="alert alert-success rounded-4 shadow-sm border-0 mb-4">@TempData["Msg"]</div>
+        }
+        
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                @if (Model != null && Model.Any()) {
+                    @foreach (var r in Model) {
+                        <div class="res-card d-flex align-items-center justify-content-between flex-wrap gap-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="bg-light rounded-3 p-3 text-primary" style="font-size:1.5rem;">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold text-dark mb-1">@(r.Libro?.Titulo ?? "Sin Titulo")</h6>
+                                    <div class="small text-muted"><i class="far fa-calendar-alt me-1"></i> Reservado el: @r.FechaReserva.ToString("dd/MM/yyyy HH:mm")</div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="status-badge st-@r.Estado">@NomEstado(r.Estado)</span>
+                                @if (r.Estado == 1) {
+                                    <form asp-action="CancelarReserva" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@r.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">Cancelar</button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    }
+                } else {
+                    <div class="text-center py-5 bg-white rounded-4 border">
+                        <i class="fas fa-bookmark fa-4x text-muted opacity-25 mb-3"></i>
+                        <h5 class="fw-bold text-dark">No tienes reservas activas</h5>
+                        <p class="text-muted">Explora el catalogo y reserva los libros que te interesen.</p>
+                        <a href="/Catalogo/Index" class="btn btn-primary rounded-pill px-4 mt-2">Ver Catalogo</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

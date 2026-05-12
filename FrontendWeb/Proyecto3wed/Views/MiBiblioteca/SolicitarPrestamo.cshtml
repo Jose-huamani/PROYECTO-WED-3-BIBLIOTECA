@@ -1,0 +1,294 @@
+@model CrearPrestamoForm
+@{
+    ViewData["Title"] = "Solicitar Préstamo";
+    var libros = (List<LibroDto>)ViewBag.Libros!;
+    var success = ViewBag.Success as string;
+    var successDetail = ViewBag.SuccessDetail as string;
+}
+
+<div class="container py-5 animate__animated animate__fadeIn">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+
+            <!-- Cabecera con Branding Dinámico -->
+            <div class="text-center mb-5">
+                <div class="brand-icon-wrapper mx-auto mb-4">
+                    <div class="brand-icon-inner">
+                        <i class="fas fa-book-reader fa-2x"></i>
+                    </div>
+                    <div class="brand-pulse"></div>
+                </div>
+                <h1 class="display-6 fw-800 text-white mb-2">Solicitar Préstamo</h1>
+                <p class="text-muted lead-sm">Explora el conocimiento. Gestiona tus lecturas de forma inteligente.</p>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(success))
+            {
+                <div class="card border-0 shadow-lg mb-5 bg-gradient-success text-white rounded-5 overflow-hidden animate__animated animate__backInUp" id="prestamoConfirmacion">
+                    <div class="card-body p-5 text-center position-relative">
+                        <div class="confetti-icon">
+                            <i class="fas fa-check-circle fa-4x mb-3"></i>
+                        </div>
+                        <h2 class="h4 fw-bold">@success</h2>
+                        <p class="opacity-90 mb-4">@successDetail</p>
+                        <div class="d-flex justify-content-center gap-3">
+                            <a asp-action="Prestamos" class="btn btn-white-glass rounded-pill px-4 fw-bold">
+                                <i class="fas fa-layer-group me-2"></i>Ver mis Préstamos
+                            </a>
+                            <a asp-controller="Catalogo" asp-action="Index" class="btn btn-outline-white rounded-pill px-4">
+                                <i class="fas fa-search me-2"></i>Catálogo
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Formulario Estilo "Glass-Card" -->
+            <div class="card border-0 shadow-soft rounded-5 overflow-hidden bg-white border-top-accent">
+                <div class="card-body p-4 p-md-5">
+                    <form asp-action="SolicitarPrestamo" method="post" id="loanForm">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-soft-danger border-0 rounded-4 mb-4 small"></div>
+
+                        <!-- Selector de Libro con Preview -->
+                        <div class="form-group-custom mb-4">
+                            <label class="form-label-pill" asp-for="LibroId">
+                                <i class="fas fa-bookmark me-2"></i>Obra Literaria
+                            </label>
+                            <div class="input-modern">
+                                <select asp-for="LibroId" class="form-select custom-select-lg" id="libroSelector">
+                                    <option value="0" disabled selected>Busca o selecciona un título...</option>
+                                    @foreach (var l in libros)
+                                    {
+                                        <option value="@l.Id" data-stock="@l.CantidadDisponible">
+                                            @l.Titulo — (@l.CantidadDisponible unidades en estante)
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+                            <span asp-validation-for="LibroId" class="text-danger extra-small mt-1 ms-2 d-block"></span>
+                        </div>
+
+                        <div class="row g-4 mb-5">
+                            <!-- Cantidad -->
+                            <div class="col-md-6">
+                                <div class="form-group-custom">
+                                    <label class="form-label-pill" asp-for="Cantidad">
+                                        <i class="fas fa-copy me-2"></i>Cantidad
+                                    </label>
+                                    <div class="input-modern">
+                                        <input asp-for="Cantidad" class="form-control" type="number" min="1" max="20" placeholder="0" />
+                                        <span class="input-unit text-muted small">unid.</span>
+                                    </div>
+                                    <span asp-validation-for="Cantidad" class="text-danger extra-small mt-1 ms-2 d-block"></span>
+                                </div>
+                            </div>
+
+                            <!-- Días -->
+                            <div class="col-md-6">
+                                <div class="form-group-custom">
+                                    <label class="form-label-pill" asp-for="DiasPrestamo">
+                                        <i class="fas fa-hourglass-half me-2"></i>Periodo (Días)
+                                    </label>
+                                    <div class="input-modern">
+                                        <input asp-for="DiasPrestamo" class="form-control" type="number" min="1" max="90" placeholder="Máx. 90" />
+                                        <span class="input-unit text-muted small">días</span>
+                                    </div>
+                                    <span asp-validation-for="DiasPrestamo" class="text-danger extra-small mt-1 ms-2 d-block"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel de Acciones -->
+                        <div class="action-panel p-1 rounded-pill bg-light d-flex align-items-center">
+                            <a asp-action="Prestamos" class="btn btn-link text-muted text-decoration-none px-4 rounded-pill">
+                                <i class="fas fa-chevron-left me-2 small"></i>Volver
+                            </a>
+                            <button type="submit" class="btn btn-primary-gradient btn-lg rounded-pill fw-bold shadow-accent py-3 flex-grow-1" id="btnConfirmarPrestamo">
+                                <span><i class="fas fa-paper-plane me-2"></i>Confirmar Solicitud</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-deep: #423A8E;
+        --accent-cyan: #8b5cf6;
+        --soft-bg: #f8fafc;
+        --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        --primary-gradient: linear-gradient(135deg, #423A8E 0%, #6366f1 100%);
+    }
+
+    .text-white {
+        color: #171717;
+    }
+
+    .fw-800 {
+        font-weight: 800;
+    }
+
+    /* Icono de Marca Animado */
+    .brand-icon-wrapper {
+        position: relative;
+        width: 80px;
+        height: 80px;
+    }
+
+    .brand-icon-inner {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        height: 100%;
+        background: var(--primary-gradient);
+        color: white;
+        border-radius: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 25px rgba(66, 58, 142, 0.3);
+    }
+
+    .brand-pulse {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--accent-cyan);
+        border-radius: 24px;
+        z-index: 1;
+        opacity: 0.3;
+        animation: pulse-ring 2s infinite;
+    }
+
+    @@keyframes pulse-ring {
+        0% {
+            transform: scale(0.95);
+            opacity: 0.5;
+        }
+
+        70% {
+            transform: scale(1.2);
+            opacity: 0;
+        }
+
+        100% {
+            transform: scale(0.95);
+            opacity: 0;
+        }
+    }
+
+    /* Card Styling */
+    .shadow-soft {
+        box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+    }
+
+    .border-top-accent {
+        border-top: 5px solid var(--accent-cyan) !important;
+    }
+
+    .bg-gradient-success {
+        background: var(--success-gradient);
+    }
+
+    /* Inputs Modernos */
+    .form-label-pill {
+        display: inline-block;
+        padding: 4px 16px;
+        background: var(--soft-bg);
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #64748b;
+        margin-bottom: 10px;
+    }
+
+    .input-modern {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+        .input-modern .form-control, .input-modern .form-select {
+            border: 2px solid #f1f5f9;
+            background-color: #f8fafc;
+            border-radius: 16px;
+            padding: 12px 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+            .input-modern .form-control:focus {
+                border-color: var(--accent-cyan);
+                background-color: white;
+                box-shadow: 0 8px 20px rgba(0, 204, 205, 0.1);
+            }
+
+    .input-unit {
+        position: absolute;
+        right: 20px;
+        pointer-events: none;
+    }
+
+    /* Botones */
+    .btn-primary-gradient {
+        background: var(--primary-gradient);
+        color: white;
+        border: none;
+        transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+        .btn-primary-gradient:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(66, 58, 142, 0.4);
+            color: white;
+        }
+
+    .btn-white-glass {
+        background: rgba(255, 255, 255, 0.9);
+        color: var(--primary-deep);
+        border: none;
+    }
+
+    .action-panel {
+        border: 1px solid #e2e8f0;
+    }
+
+    .alert-soft-danger {
+        background-color: #fff1f2;
+        color: #e11d48;
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function() {
+            // Animación suave de entrada para el éxito
+            const successCard = $('#prestamoConfirmacion');
+            if (successCard.length) {
+                $('html, body').animate({
+                    scrollTop: successCard.offset().top - 100
+                }, 800);
+            }
+
+            // Feedback en el botón de envío
+            $('#loanForm').on('submit', function() {
+                const btn = $('#btnConfirmarPrestamo');
+                if ($(this).valid()) {
+                    btn.attr('disabled', true);
+                    btn.html('<span class="spinner-border spinner-border-sm me-2"></span>Enviando a Biblioteca...');
+                }
+            });
+
+            // Mejora visual para el select (cambio de color al seleccionar)
+            $('#libroSelector').on('change', function() {
+                $(this).closest('.input-modern').css('border-color', 'var(--accent-cyan)');
+            });
+        });
+    </script>
+}

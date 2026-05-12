@@ -1,0 +1,385 @@
+@using Microsoft.AspNetCore.Http
+@using Proyecto3wed.Infrastructure
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    var ctx = HttpContextAccessor.HttpContext;
+    var loggedIn = !string.IsNullOrEmpty(ctx?.Session.GetString(SessionKeys.AccessToken));
+    var userName = ctx?.Session.GetString(SessionKeys.UserName) ?? "Usuario";
+    var role = ctx?.Session.GetString(SessionKeys.UserRole);
+    var isStaff = role == "Administrador" || role == "Bibliotecario";
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Smart Library</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* GLOBAL NEW CELESTE THEME VARIABLES */
+            --dark-dark: #0f172a;
+            --dark-medium: #1e293b;
+            --accent-teal: #0ea5e9; /* Celeste Light Blue */
+            --accent-blue: #38bdf8;
+            --soft-bg: #f8fafc;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--soft-bg);
+            color: #334155;
+            overflow-x: hidden;
+        }
+
+        .bg-light-subtle { background-color: #f1f5f9 !important; }
+        .text-dark { color: #0f172a !important; }
+        
+        /* Modales transparentes claros */
+        .modal-content {
+            border: none;
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--soft-bg);
+            color: #334155;
+            overflow-x: hidden;
+        }
+
+        /* --- NAVEGACIÓN PREMIUM --- */
+        .glass-nav {
+            background: rgba(15, 23, 42, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--accent-teal);
+            padding: 0.8rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            font-size: 1.4rem;
+        }
+
+        .brand-accent {
+            color: var(--accent-teal);
+        }
+
+        .nav-link {
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem !important;
+            transition: all 0.3s ease;
+            color: rgba(255,255,255,0.8) !important;
+        }
+
+            .nav-link:hover {
+                color: var(--accent-teal) !important;
+                transform: translateY(-1px);
+            }
+
+        /* Estilo especial para el Carrito */
+        .nav-cart-link {
+            color: var(--accent-teal) !important;
+            background: rgba(0, 204, 205, 0.1);
+            border-radius: 50px;
+            margin-left: 5px;
+            border: 1px solid rgba(0, 204, 205, 0.2);
+        }
+
+            .nav-cart-link:hover {
+                background: var(--accent-teal) !important;
+                color: var(--dark-dark) !important;
+            }
+
+        /* --- BOTONES Y BADGES --- */
+        .btn-accent-pill {
+            background-color: var(--accent-teal);
+            color: var(--dark-dark);
+            font-weight: 700;
+            border-radius: 50px;
+            padding: 0.5rem 1.5rem;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+            .btn-accent-pill:hover {
+                background-color: #ffffff;
+                box-shadow: 0 0 15px var(--accent-glow);
+                transform: translateY(-2px);
+            }
+
+        .user-profile-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+        }
+
+        /* --- FOOTER --- */
+        .footer-premium {
+            background: var(--dark-dark);
+            border-top: 4px solid var(--accent-teal);
+            color: white;
+        }
+
+        .author-box {
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .author-icon {
+            width: 35px;
+            height: 35px;
+            background: var(--accent-teal);
+            color: var(--dark-dark);
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <header class="sticky-top">
+        <nav class="navbar navbar-expand-lg navbar-dark glass-nav shadow-lg">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center" asp-controller="@(isStaff ? "Admin" : "Catalogo")" asp-action="@(isStaff ? "Dashboard" : "Index")">
+                    <i class="fas fa-layer-group brand-accent me-2"></i>
+                    <span>SMART<span class="brand-accent">LIBRARY</span></span>
+                    @if (isStaff)
+                    {
+                        <span class="badge bg-danger text-white ms-2" style="font-size: 0.65rem; padding: 0.3em 0.5em;">ADMINISTRADOR</span>
+                    }
+                </a>
+
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navMain">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                        @if (isStaff)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-accent fw-bold" asp-controller="Admin" asp-action="Dashboard">
+                                    <i class="fas fa-chart-pie me-1"></i> Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="catDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-book me-1"></i> Catálogo
+                                </a>
+                                <ul class="dropdown-menu shadow-lg border-0 rounded-4" aria-labelledby="catDropdown">
+                                    <li><a class="dropdown-item py-2" asp-controller="Admin" asp-action="Libros"><i class="fas fa-swatchbook me-2 text-accent"></i> Gestión Libros</a></li>
+                                    <li><a class="dropdown-item py-2" asp-controller="Admin" asp-action="Reservas"><i class="fas fa-bookmark me-2 text-warning"></i> Reservas Pendientes</a></li>
+                                    <li><a class="dropdown-item py-2" asp-controller="Admin" asp-action="Gamificacion"><i class="fas fa-trophy me-2 text-gold"></i> Ranking y Gamificación</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="opDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-tasks me-1"></i> Operaciones
+                                </a>
+                                <ul class="dropdown-menu shadow-lg border-0 rounded-4" aria-labelledby="opDropdown">
+                                    <li><a class="dropdown-item py-2" asp-controller="Admin" asp-action="Prestamos"><i class="fas fa-hand-holding-box me-2 text-success"></i> Préstamos y Devoluciones</a></li>
+                                    <li><a class="dropdown-item py-2" asp-controller="Admin" asp-action="Multas"><i class="fas fa-file-invoice-dollar me-2 text-danger"></i> Gestión de Multas</a></li>
+                                    <li><a class="dropdown-item py-2" asp-controller="Admin" asp-action="Ventas"><i class="fas fa-shopping-cart me-2 text-info"></i> Ventas y Tienda</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="sysDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-cogs me-1"></i> Sistema
+                                </a>
+                                <ul class="dropdown-menu shadow-lg border-0 rounded-4" aria-labelledby="sysDropdown">
+                                    <li><a class="dropdown-item py-2" asp-controller="Admin" asp-action="Usuarios"><i class="fas fa-users-cog me-2 text-primary"></i> Gestión Usuarios</a></li>
+                                    <li><a class="dropdown-item py-2" asp-controller="Admin" asp-action="Empleados"><i class="fas fa-id-badge me-2 text-info"></i> Gestión Empleados</a></li>
+                                    <li><a class="dropdown-item py-2" asp-controller="Admin" asp-action="Notificaciones"><i class="fas fa-bell me-2 text-warning"></i> Notificaciones</a></li>
+                                    <li><a class="dropdown-item py-2" asp-controller="Admin" asp-action="Reportes"><i class="fas fa-chart-line me-2 text-success"></i> Reportes Generales</a></li>
+                                    <li><hr class="dropdown-divider bg-dark opacity-25"></li>
+                                    <li><a class="dropdown-item py-2" asp-controller="Admin" asp-action="Auditoria"><i class="fas fa-shield-alt me-2 text-danger"></i> Registro Auditoría</a></li>
+                                    <li><a class="dropdown-item py-2" asp-controller="Admin" asp-action="Configuracion"><i class="fas fa-sliders-h me-2 text-secondary"></i> Configuración</a></li>
+                                    <li><a class="dropdown-item py-2" asp-controller="Admin" asp-action="Perfil"><i class="fas fa-user-circle me-2 text-primary"></i> Mi Perfil</a></li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="Catalogo" asp-action="Index">Catálogo Digital</a></li>
+
+                            <!-- ENLACE AL CARRITO (MI LIBRERÍA) -->
+                            <li class="nav-item">
+                                <a class="nav-link nav-cart-link px-3" asp-controller="Tienda" asp-action="Carrito">
+                                    <i class="fas fa-shopping-basket me-1"></i> Mi Carrito
+                                </a>
+                            </li>
+
+                            <li class="nav-item"><a class="nav-link" asp-controller="Catalogo" asp-action="BuscarQr"><i class="fas fa-qrcode me-1"></i> Escáner QR</a></li>
+                        }
+
+                        @if (!isStaff)
+                        {
+                            <li class="nav-item"><a class="nav-link fw-bold border-start border-white border-opacity-10 ms-lg-2 ps-lg-3 text-accent" asp-controller="Usuario" asp-action="Dashboard"><i class="fas fa-home me-1"></i> Inicio</a></li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="userLibDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-book-reader me-1"></i> Mi Biblioteca
+                                </a>
+                                <ul class="dropdown-menu shadow-lg border-0 rounded-4" aria-labelledby="userLibDropdown">
+                                    <li><a class="dropdown-item py-2" asp-controller="MiBiblioteca" asp-action="Prestamos"><i class="fas fa-box me-2 text-primary"></i> Mis préstamos</a></li>
+                                    <li><a class="dropdown-item py-2" asp-controller="MiBiblioteca" asp-action="Reservas"><i class="fas fa-bookmark me-2 text-warning"></i> Mis reservas</a></li>
+                                    <li><a class="dropdown-item py-2" asp-controller="MiBiblioteca" asp-action="Favoritos"><i class="fas fa-heart me-2 text-danger"></i> Favoritos</a></li>
+                                    <li><a class="dropdown-item py-2" asp-controller="Usuario" asp-action="Historial"><i class="fas fa-history me-2 text-secondary"></i> Historial</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Tienda" asp-action="Index"><i class="fas fa-store me-1"></i> Tienda</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Usuario" asp-action="Ranking"><i class="fas fa-trophy me-1" style="color: gold;"></i> Ranking</a></li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="MiBiblioteca" asp-action="Notificaciones">
+                                    <i class="fas fa-bell me-1"></i> Notificaciones
+                                </a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="userConfDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-cog me-1"></i>
+                                </a>
+                                <ul class="dropdown-menu shadow-lg border-0 rounded-4" aria-labelledby="userConfDropdown">
+                                    <li><a class="dropdown-item py-2" asp-controller="Usuario" asp-action="Perfil"><i class="fas fa-user me-2 text-info"></i> Perfil</a></li>
+                                    <li><a class="dropdown-item py-2" asp-controller="Usuario" asp-action="Configuracion"><i class="fas fa-sliders-h me-2 text-secondary"></i> Configuración</a></li>
+                                </ul>
+                            </li>
+                        }
+                    </ul>
+
+                    <div class="d-flex align-items-center gap-3">
+                        @if (loggedIn)
+                        {
+                            @if (isStaff)
+                            {
+                                <a asp-controller="Admin" asp-action="Perfil" class="user-profile-btn d-none d-md-flex align-items-center text-decoration-none">
+                                    <i class="fas fa-user-shield me-2 brand-accent"></i>
+                                    <span class="fw-medium">@userName</span>
+                                    <span class="badge bg-accent-teal text-dark ms-2" style="font-size: 0.6rem;">@role</span>
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-controller="Usuario" asp-action="Perfil" class="user-profile-btn d-none d-md-flex align-items-center text-decoration-none">
+                                    <i class="fas fa-user-circle me-2 brand-accent"></i>
+                                    <span class="fw-medium">@userName</span>
+                                    <span class="badge bg-accent-teal text-dark ms-2" style="font-size: 0.6rem;">@role</span>
+                                </a>
+                            }
+                            <form asp-controller="Account" asp-action="Logout" method="post">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-outline-light btn-sm rounded-pill px-3 fw-bold border-opacity-25">
+                                    <i class="fas fa-sign-out-alt me-1"></i> Salir
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a class="nav-link text-white small" asp-controller="Account" asp-action="Login">Iniciar Sesión</a>
+                            <a class="btn btn-accent-pill shadow-sm" asp-controller="Account" asp-action="Register">Unirse</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container mt-4">
+        @if (TempData["Msg"] != null)
+        {
+            <div class="alert alert-success alert-floating animate__animated animate__fadeInDown d-flex align-items-center" role="alert">
+                <i class="fas fa-check-circle fa-lg me-3"></i>
+                <div>@TempData["Msg"]</div>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Err"] != null)
+        {
+            <div class="alert alert-danger alert-floating animate__animated animate__fadeInDown d-flex align-items-center" role="alert">
+                <i class="fas fa-exclamation-triangle fa-lg me-3"></i>
+                <div>@TempData["Err"]</div>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+            </div>
+        }
+    </div>
+
+    <main role="main" class="flex-grow-1">
+        @RenderBody()
+    </main>
+
+    <footer class="footer-premium pt-5 pb-4 mt-5">
+        <div class="container">
+            <div class="row g-4 align-items-center text-center text-md-start">
+                <div class="col-md-5">
+                    <div class="footer-logo mb-3">
+                        <i class="fas fa-university brand-accent"></i> SMART<span class="brand-accent">LIBRARY</span>
+                    </div>
+                    <p class="text-white-50 small pe-md-5">
+                        Plataforma de gestión de recursos académicos diseñada para la optimización de procesos bibliotecarios en <strong>Cochabamba, Bolivia</strong>.
+                    </p>
+                    <div class="d-flex gap-3 justify-content-center justify-content-md-start mt-4">
+                        <span class="badge bg-white bg-opacity-10 p-2"><i class="fas fa-shield-alt text-accent me-1"></i> SSL Secure</span>
+                        <span class="badge bg-white bg-opacity-10 p-2"><i class="fas fa-code text-accent me-1"></i> PRX CORE v5</span>
+                    </div>
+                </div>
+
+                <div class="col-md-7">
+                    <div class="author-box">
+                        <h6 class="text-uppercase small fw-800 text-accent mb-4 letter-spacing-1">Desarrollo de Ingeniería de Sistemas</h6>
+                        <div class="row">
+                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                <div class="d-flex align-items-center">
+                                    <div class="author-icon"><i class="fas fa-user-code"></i></div>
+                                    <div>
+                                        <div class="fw-bold mb-0">Jose Andres Huamani</div>
+                                        <small class="text-white-50">Lead Backend Architect</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="author-icon"><i class="fas fa-terminal"></i></div>
+                                    <div>
+                                        <div class="fw-bold mb-0">Brian Luis Aranibar</div>
+                                        <small class="text-white-50">Cloud Infrastructure</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4 border-white opacity-10">
+
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center text-white-50 small">
+                <p class="mb-0">&copy; 2026 · <span class="text-white fw-bold">Universidad del Valle</span></p>
+                <div class="d-flex gap-4 mt-3 mt-md-0">
+                    <span>Sistemas · Univalle</span>
+                    <a href="#" class="text-white-50 text-decoration-none hover-accent">Soporte Técnico</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

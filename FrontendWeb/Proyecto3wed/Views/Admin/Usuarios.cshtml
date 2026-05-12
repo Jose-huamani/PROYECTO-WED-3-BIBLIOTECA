@@ -1,0 +1,404 @@
+@model List<AdminUsuarioDto>
+@{
+    ViewData["Title"] = "Gestión de Usuarios";
+}
+
+<style>
+    .usr-shell { background: #f8fafc; min-height: 100vh; padding-bottom: 4rem; }
+    .usr-header {
+        background: linear-gradient(135deg, #0f172a 0%, #0369a1 100%);
+        color: white; padding: 2.5rem 2rem;
+        border-radius: 0 0 2.5rem 2.5rem;
+        margin-bottom: 2rem;
+    }
+    .avatar-circle {
+        width: 46px; height: 46px; border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 800; font-size: 1.1rem; transition: 0.3s;
+    }
+    tr:hover .avatar-circle { transform: scale(1.1) rotate(-5deg); }
+    .bg-user-soft { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+    .bg-danger-soft { background: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; }
+    .custom-table thead th {
+        font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;
+        color: #64748b; background: #f8fafc; border: none; padding: 1rem;
+    }
+    .custom-table tbody tr { transition: all 0.2s; }
+    .custom-table tbody tr:hover { background: #f0f9ff !important; }
+    .status-pill {
+        padding: 3px 10px; border-radius: 50px; font-size: 0.65rem; font-weight: 800;
+        text-transform: uppercase;
+    }
+    .status-pill.ok { background: #ecfdf5; color: #059669; border: 1px solid #10b98133; }
+    .status-pill.danger { background: #fee2e2; color: #991b1b; border: 1px solid #ef444433; }
+    .btn-action { width: 34px; height: 34px; border-radius: 9px; border: none;
+        display: inline-flex; align-items: center; justify-content: center; transition: 0.2s; }
+    .btn-action:hover { transform: translateY(-2px); }
+    .metric-chip {
+        background: #f1f5f9; padding: 3px 10px; border-radius: 50px;
+        font-size: 0.7rem; font-weight: 700;
+    }
+    .modal-content { border: none; border-radius: 1.5rem; }
+    .modal-header { border-bottom: 1px solid #f1f5f9; padding: 1.5rem 2rem; }
+    .modal-footer { border-top: 1px solid #f1f5f9; padding: 1rem 2rem; }
+    .form-label { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: #64748b; }
+    .form-control, .form-select { border-radius: 0.75rem; border: 1.5px solid #e2e8f0; padding: 0.7rem 1rem; }
+    .form-control:focus, .form-select:focus { border-color: #0ea5e9; box-shadow: 0 0 0 4px rgba(14,165,233,0.1); }
+</style>
+
+<div class="usr-shell">
+    <!-- Header -->
+    <div class="usr-header">
+        <div class="container-fluid px-4">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <div>
+                    <span class="badge bg-info text-white fw-bold mb-2 px-3">ADMINISTRACIÓN</span>
+                    <h1 class="fw-bold display-6 mb-1"><i class="fas fa-users-cog me-3"></i>Gestión de Usuarios</h1>
+                    <p class="opacity-75 mb-0">CRUD completo · Bloqueo · Roles · @Model.Count usuarios registrados</p>
+                </div>
+                <button class="btn btn-light rounded-pill px-4 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalCrear">
+                    <i class="fas fa-user-plus me-2 text-primary"></i>Nuevo Usuario
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid px-4">
+        <!-- Alertas -->
+        @if (TempData["Msg"] is string msg)
+        {
+            <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm border-0" role="alert">
+                <i class="fas fa-check-circle me-2"></i>@msg
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Err"] is string err)
+        {
+            <div class="alert alert-danger alert-dismissible fade show rounded-4 shadow-sm border-0" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>@err
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="row g-4">
+            <!-- Tabla principal -->
+            <div class="col-12">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-header bg-white py-3 px-4 border-0 d-flex align-items-center justify-content-between flex-wrap gap-3">
+                        <h6 class="fw-bold text-dark mb-0"><i class="fas fa-list me-2 text-primary"></i>Directorio de Usuarios (@Model.Count)</h6>
+                        <div class="position-relative">
+                            <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" style="font-size:0.8rem;"></i>
+                            <input class="form-control form-control-sm rounded-pill ps-5 bg-light border-0" id="userFilter" placeholder="Buscar por nombre o correo..." style="width: 280px;">
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table align-middle custom-table mb-0" id="usersTable">
+                            <thead>
+                                <tr>
+                                    <th class="ps-4">Usuario</th>
+                                    <th>Correo</th>
+                                    <th>Rol</th>
+                                    <th class="text-center">Estado</th>
+                                    <th class="text-center">Métricas</th>
+                                    <th class="text-end pe-4">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var u in Model)
+                                {
+                                    <tr>
+                                        <td class="ps-4 py-3">
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-circle me-3 @(u.Activo ? "bg-user-soft" : "bg-danger-soft")">
+                                                    @u.NombreCompleto.Substring(0, 1).ToUpper()
+                                                </div>
+                                                <div class="fw-bold text-dark" style="font-size:0.88rem;">@u.NombreCompleto</div>
+                                            </div>
+                                        </td>
+                                        <td><span class="text-muted small">@u.Email</span></td>
+                                        <td>
+                                            <span class="badge bg-light text-dark border fw-bold small px-2">@u.Rol</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="status-pill @(u.Activo ? "ok" : "danger")">
+                                                <i class="fas fa-circle me-1" style="font-size:0.4rem;"></i>
+                                                @(u.Activo ? "Activo" : "Bloqueado")
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="d-flex justify-content-center gap-1 flex-wrap">
+                                                <span class="metric-chip" title="Préstamos activos">
+                                                    <i class="fas fa-book-open text-primary me-1"></i>@u.PrestamosActivos
+                                                </span>
+                                                <span class="metric-chip" title="Multas pendientes">
+                                                    <i class="fas fa-gavel text-danger me-1"></i>@u.MultasPendientes
+                                                </span>
+                                                <span class="metric-chip" title="Puntos gamificación">
+                                                    <i class="fas fa-star text-warning me-1"></i>@u.Puntos
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td class="text-end pe-4">
+                                            <div class="d-flex justify-content-end gap-2">
+                                                <!-- Ver Detalles -->
+                                                <button class="btn btn-action btn-light border shadow-sm"
+                                                        title="Ver detalles"
+                                                        data-bs-toggle="modal" data-bs-target="#modalVer-@u.Id">
+                                                    <i class="fas fa-eye text-primary" style="font-size:0.8rem;"></i>
+                                                </button>
+                                                <!-- Editar -->
+                                                <button class="btn btn-action btn-light border shadow-sm"
+                                                        title="Editar usuario"
+                                                        data-bs-toggle="modal" data-bs-target="#modalEdit-@u.Id">
+                                                    <i class="fas fa-edit text-info" style="font-size:0.8rem;"></i>
+                                                </button>
+                                                <!-- Bloquear / Activar -->
+                                                <form asp-action="CambiarEstadoUsuario" method="post" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@u.Id" />
+                                                    <input type="hidden" name="activo" value="@(!u.Activo)" />
+                                                    <button class="btn btn-action @(u.Activo ? "btn-outline-warning" : "btn-outline-success") shadow-sm"
+                                                            type="submit" title="@(u.Activo ? "Bloquear" : "Activar")">
+                                                        <i class="fas @(u.Activo ? "fa-user-lock" : "fa-user-check")" style="font-size:0.8rem;"></i>
+                                                    </button>
+                                                </form>
+                                                <!-- Eliminar -->
+                                                <button class="btn btn-action btn-outline-danger shadow-sm"
+                                                        title="Eliminar usuario"
+                                                        data-bs-toggle="modal" data-bs-target="#modalDel-@u.Id">
+                                                    <i class="fas fa-trash-alt" style="font-size:0.8rem;"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        @if (!Model.Any())
+                        {
+                            <div class="text-center py-5 text-muted">
+                                <i class="fas fa-users fa-3x mb-3 opacity-25"></i>
+                                <p class="fw-bold">No hay usuarios registrados.</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- MODAL CREAR USUARIO                                         -->
+<!-- ============================================================ -->
+<div class="modal fade" id="modalCrear" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header">
+                <h5 class="fw-bold text-dark mb-0"><i class="fas fa-user-plus text-primary me-2"></i>Registrar Nuevo Usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="CrearUsuario" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre Completo</label>
+                        <input name="NombreCompleto" class="form-control" placeholder="Ej: Juan Pérez" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Correo Electrónico</label>
+                        <input name="Email" type="email" class="form-control" placeholder="correo@ejemplo.com" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contraseña Temporal</label>
+                        <input name="Password" type="password" class="form-control" placeholder="Mínimo 6 caracteres" required minlength="6" />
+                    </div>
+                    <div>
+                        <label class="form-label">Nivel de Acceso</label>
+                        <select name="RolId" class="form-select">
+                            <option value="2">👤 Estudiante / Lector</option>
+                            <option value="3">📚 Bibliotecario</option>
+                            <option value="1">🛡️ Administrador</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">
+                        <i class="fas fa-user-check me-2"></i>Crear Cuenta
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- MODALES POR USUARIO (Ver, Editar, Eliminar)                 -->
+<!-- ============================================================ -->
+@foreach (var u in Model)
+{
+    <!-- MODAL VER DETALLES -->
+    <div class="modal fade" id="modalVer-@u.Id" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 text-center">
+                    <div class="avatar-circle mx-auto mb-3 @(u.Activo ? "bg-user-soft" : "bg-danger-soft")" style="width:70px;height:70px;border-radius:50%;font-size:2rem;">
+                        @u.NombreCompleto.Substring(0, 1).ToUpper()
+                    </div>
+                    <h5 class="fw-bold text-dark mb-1">@u.NombreCompleto</h5>
+                    <p class="text-muted small mb-3">@u.Email</p>
+                    <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-2 mb-4 d-inline-block">@u.Rol</span>
+                    <div class="row g-3 text-center">
+                        <div class="col-4">
+                            <div class="bg-light p-3 rounded-3">
+                                <div class="fw-bold text-primary fs-5">@u.PrestamosActivos</div>
+                                <div class="text-muted extra-small">Préstamos</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="bg-light p-3 rounded-3">
+                                <div class="fw-bold text-danger fs-5">@u.MultasPendientes</div>
+                                <div class="text-muted extra-small">Multas</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="bg-light p-3 rounded-3">
+                                <div class="fw-bold text-warning fs-5">@u.Puntos</div>
+                                <div class="text-muted extra-small">Puntos</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <span class="status-pill @(u.Activo ? "ok" : "danger") px-3 py-2">
+                            @(u.Activo ? "✅ Cuenta Activa" : "🔴 Cuenta Bloqueada")
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EDITAR -->
+    <div class="modal fade" id="modalEdit-@u.Id" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header">
+                    <h5 class="fw-bold text-dark mb-0"><i class="fas fa-user-edit text-info me-2"></i>Editar Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form asp-action="EditarUsuario" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@u.Id" />
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre Completo</label>
+                            <input name="NombreCompleto" class="form-control" value="@u.NombreCompleto" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Correo Electrónico</label>
+                            <input name="Email" type="email" class="form-control" value="@u.Email" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nueva Contraseña <span class="text-muted fw-normal">(dejar vacío = no cambiar)</span></label>
+                            <input name="Password" type="password" class="form-control" placeholder="Mínimo 6 caracteres" minlength="6" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Rol del Sistema</label>
+                            <select name="RolId" class="form-select">
+                                @{
+                                    var rolId = u.Rol == "Administrador" ? 1 : (u.Rol == "Bibliotecario" ? 3 : 2);
+                                }
+                                @if (rolId == 2)
+                                {
+                                    <option value="2" selected>👤 Estudiante / Lector</option>
+                                    <option value="3">📚 Bibliotecario</option>
+                                    <option value="1">🛡️ Administrador</option>
+                                }
+                                else if (rolId == 3)
+                                {
+                                    <option value="2">👤 Estudiante / Lector</option>
+                                    <option value="3" selected>📚 Bibliotecario</option>
+                                    <option value="1">🛡️ Administrador</option>
+                                }
+                                else
+                                {
+                                    <option value="2">👤 Estudiante / Lector</option>
+                                    <option value="3">📚 Bibliotecario</option>
+                                    <option value="1" selected>🛡️ Administrador</option>
+                                }
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Estado de la Cuenta</label>
+                            <select name="Activo" class="form-select">
+                                @if (u.Activo)
+                                {
+                                    <option value="True" selected>✅ Activo</option>
+                                    <option value="False">🔴 Bloqueado</option>
+                                }
+                                else
+                                {
+                                    <option value="True">✅ Activo</option>
+                                    <option value="False" selected>🔴 Bloqueado</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-info text-white rounded-pill px-4 fw-bold">
+                            <i class="fas fa-save me-2"></i>Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL ELIMINAR -->
+    <div class="modal fade" id="modalDel-@u.Id" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content shadow-lg">
+                <div class="modal-body text-center p-5">
+                    <div class="text-danger mb-4">
+                        <i class="fas fa-user-times fa-4x"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">¿Eliminar a @u.NombreCompleto?</h5>
+                    <p class="text-muted small mb-4">
+                        @if (u.PrestamosActivos > 0 || u.MultasPendientes > 0)
+                        {
+                            <span class="text-warning"><i class="fas fa-exclamation-triangle me-1"></i>Tiene préstamos o multas activas. Se bloqueará en lugar de eliminarse.</span>
+                        }
+                        else
+                        {
+                            <span>Esta acción no se puede deshacer.</span>
+                        }
+                    </p>
+                    <form asp-action="EliminarUsuario" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@u.Id" />
+                        <button type="button" class="btn btn-light rounded-pill px-4 me-2 fw-bold" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold">
+                            <i class="fas fa-trash me-1"></i>Confirmar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+<script>
+    const userFilter = document.getElementById('userFilter');
+    const rows = [...document.querySelectorAll('#usersTable tbody tr')];
+    userFilter?.addEventListener('input', () => {
+        const val = userFilter.value.toLowerCase();
+        rows.forEach(r => { r.style.display = r.innerText.toLowerCase().includes(val) ? '' : 'none'; });
+    });
+</script>
+}

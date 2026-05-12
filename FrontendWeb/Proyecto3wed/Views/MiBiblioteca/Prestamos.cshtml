@@ -1,0 +1,82 @@
+﻿@model List<PrestamoDto>
+@{
+    ViewData["Title"] = "Mis Prestamos";
+    string NomEstado(int e) => e switch { 1 => "Activo", 2 => "Devuelto", 3 => "Cancelado", _ => e.ToString() };
+}
+
+<style>
+    .pre-shell { background: #f8fafc; min-height: 100vh; padding-bottom: 4rem; }
+    .pre-header {
+        background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+        color: white; padding: 3rem 2rem;
+        border-radius: 0 0 2.5rem 2.5rem; margin-bottom: 2rem;
+    }
+    .pre-card {
+        background: white; border-radius: 1.5rem; border: 1px solid #e2e8f0;
+        padding: 1.5rem; margin-bottom: 1rem; transition: 0.3s;
+    }
+    .pre-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(22, 163, 74, 0.1); border-color: #16a34a; }
+    .status-badge { padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+    .st-1 { background: #dcfce7; color: #15803d; } /* Activo */
+    .st-2 { background: #f1f5f9; color: #64748b; } /* Devuelto */
+</style>
+
+<div class="pre-shell">
+    <div class="pre-header">
+        <div class="container">
+            <h1 class="fw-bold mb-1"><i class="fas fa-book-reader me-2"></i> Mis Prestamos</h1>
+            <p class="opacity-75 mb-0">Controla tus fechas de devolucion y revisa tus lecturas actuales.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        @if (TempData["Msg"] != null) {
+            <div class="alert alert-success rounded-4 shadow-sm border-0 mb-4">@TempData["Msg"]</div>
+        }
+
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                @if (Model != null && Model.Any()) {
+                    @foreach (var p in Model) {
+                        <div class="pre-card">
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-light rounded-3 p-3 text-success" style="font-size:1.5rem;">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                    <div>
+                                        @foreach(var d in p.Detalles) {
+                                            <h6 class="fw-bold text-dark mb-0">@(d.Libro?.Titulo ?? "Sin Titulo")</h6>
+                                        }
+                                        <div class="small text-muted mt-1">
+                                            <i class="far fa-calendar-alt me-1"></i> Prestado: @p.FechaPrestamo.ToString("dd/MM/yyyy")
+                                            <span class="mx-2">|</span>
+                                            <i class="far fa-clock me-1"></i> Devolucion: <span class="@(p.Estado == 1 && p.FechaDevolucionEsperada < DateTime.Now ? "text-danger fw-bold" : "")">@p.FechaDevolucionEsperada.ToString("dd/MM/yyyy")</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                                    <span class="status-badge st-@p.Estado">@NomEstado(p.Estado)</span>
+                                    @if (p.Estado == 1) {
+                                        <form asp-action="Devolver" method="post">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@p.Id" />
+                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 fw-bold">Devolver</button>
+                                        </form>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                } else {
+                    <div class="text-center py-5 bg-white rounded-4 border">
+                        <i class="fas fa-book-open fa-4x text-muted opacity-25 mb-3"></i>
+                        <h5 class="fw-bold text-dark">No tienes prestamos activos</h5>
+                        <p class="text-muted">¡Es un buen momento para empezar una nueva lectura!</p>
+                        <a href="/Catalogo/Index" class="btn btn-success rounded-pill px-4 mt-2">Ir al Catalogo</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

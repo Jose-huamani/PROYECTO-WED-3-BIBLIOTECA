@@ -1,0 +1,286 @@
+@{
+    ViewData["Title"] = "IA Core";
+}
+
+<div class="ia-core-wrapper py-5">
+    <div class="container animate__animated animate__fadeIn">
+        <div class="row justify-content-center">
+            <div class="col-lg-11 col-xl-10">
+
+                <div class="card border-0 shadow-2xl rounded-5 overflow-hidden ai-main-card">
+                    <div class="row g-0">
+
+                        <!-- Panel Izquierdo: El "Corazón" de la IA -->
+                        <div class="col-md-5 bg-dark d-flex align-items-center justify-content-center p-5 position-relative">
+                            <div class="position-relative z-index-10 text-center">
+                                <div class="ai-orbit-container mb-4">
+                                    <div class="pulse-ring"></div>
+                                    <div class="inner-brain">
+                                        <i class="fas fa-brain fa-4x text-accent"></i>
+                                    </div>
+                                    <!-- Nodos de datos orbitando -->
+                                    <div class="orbit-path">
+                                        <div class="data-node node-1"><i class="fas fa-database"></i></div>
+                                        <div class="data-node node-2"><i class="fas fa-network-wired"></i></div>
+                                        <div class="data-node node-3"><i class="fas fa-code"></i></div>
+                                    </div>
+                                </div>
+                                <h2 class="h3 fw-800 text-white mb-2">IA Engine v3.0</h2>
+                                <p class="text-white-50 small px-4">Procesamiento neuronal activo y análisis predictivo.</p>
+
+                                <div class="status-indicator mt-3">
+                                    <span class="dot"></span>
+                                    <span class="text-accent fw-bold small ls-1">SISTEMA ONLINE</span>
+                                </div>
+                            </div>
+                            <!-- Fondo con rejilla tecnológica -->
+                            <div class="tech-grid"></div>
+                        </div>
+
+                        <!-- Panel Derecho: Gestión y Capacidades -->
+                        <div class="col-md-7 p-4 p-md-5 bg-white">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div>
+                                    <h3 class="h4 fw-bold text-white mb-1">Capacidades Cognitivas</h3>
+                                    <p class="text-muted small">Optimización mediante algoritmos de Machine Learning.</p>
+                                </div>
+                                <span class="badge bg-soft-cyan text-accent border border-info border-opacity-25 px-3 py-2">
+                                    Precisión: 98.2%
+                                </span>
+                            </div>
+
+                            <div class="row g-3">
+                                @{
+                                    var funciones = new[] {
+                                                                new { Titulo = "Recomendación", Icon = "fa-wand-magic-sparkles", Color = "#3b82f6", Desc = "Personalizada" },
+                                                                new { Titulo = "Predicción", Icon = "fa-hourglass-half", Color = "#ef4444", Desc = "Flujo de préstamos" },
+                                                                new { Titulo = "Intereses", Icon = "fa-fingerprint", Color = "#10b981", Desc = "Perfil de lector" },
+                                                                new { Titulo = "Data Mining", Icon = "fa-chart-network", Color = "#f59e0b", Desc = "Tendencias" }
+                                                                };
+                                }
+
+                                @foreach (var f in funciones)
+                                {
+                                    <div class="col-6">
+                                        <div class="p-3 rounded-4 border border-light ai-feature-card h-100">
+                                            <div class="icon-circle mb-3" style="background: @(f.Color + "15"); color: @f.Color">
+                                                <i class="fas @f.Icon"></i>
+                                            </div>
+                                            <span class="fw-bold d-block text-white small">@f.Titulo</span>
+                                            <span class="text-muted" style="font-size: 0.7rem;">@f.Desc</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Métrica de Carga -->
+                            <div class="mt-5 p-4 rounded-4 bg-light border-dashed">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <span class="small fw-bold text-white">Carga de Entrenamiento</span>
+                                    <span class="small text-accent fw-bold">85%</span>
+                                </div>
+                                <div class="progress" style="height: 6px; background: #e2e8f0;">
+                                    <div class="progress-bar bg-accent progress-bar-striped progress-bar-animated" style="width: 85%"></div>
+                                </div>
+                                <button class="btn btn-dark-accent w-100 rounded-pill fw-bold py-3 mt-4 shadow-lg">
+                                    <i class="fas fa-sync-alt me-2"></i>SINCRONIZAR ALGORITMO
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --accent-cyan: #8b5cf6;
+        --dark-deep: #0a0a0a;
+        --dark-light: #171717;
+    }
+
+    .ia-core-wrapper {
+        background: #f8fafc;
+        min-height: 100vh;
+    }
+
+    .bg-dark {
+        background-color: var(--dark-deep);
+    }
+
+    .text-accent {
+        color: var(--accent-cyan) !important;
+    }
+
+    .bg-soft-cyan {
+        background-color: rgba(0, 204, 205, 0.1);
+    }
+
+    .text-white {
+        color: var(--dark-deep);
+    }
+
+    /* Animación del Núcleo */
+    .ai-orbit-container {
+        position: relative;
+        width: 180px;
+        height: 180px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .inner-brain {
+        background: rgba(0, 204, 205, 0.1);
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 5;
+        border: 1px solid rgba(0, 204, 205, 0.3);
+        box-shadow: 0 0 30px rgba(0, 204, 205, 0.2);
+    }
+
+    .orbit-path {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border: 1px dashed rgba(0, 204, 205, 0.2);
+        border-radius: 50%;
+        animation: rotateCore 20s linear infinite;
+    }
+
+    .data-node {
+        position: absolute;
+        width: 28px;
+        height: 28px;
+        background: var(--dark-light);
+        border: 1px solid var(--accent-cyan);
+        color: var(--accent-cyan);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.65rem;
+    }
+
+    .node-1 {
+        top: 0;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .node-2 {
+        bottom: 20%;
+        right: 0;
+    }
+
+    .node-3 {
+        bottom: 20%;
+        left: 0;
+    }
+
+    /* Uso de @@ para escapar en Razor */
+    @@keyframes rotateCore {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Status Dot */
+    .status-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(0,0,0,0.4);
+        padding: 4px 14px;
+        border-radius: 20px;
+    }
+
+    .dot {
+        width: 8px;
+        height: 8px;
+        background: var(--accent-cyan);
+        border-radius: 50%;
+        box-shadow: 0 0 10px var(--accent-cyan);
+        animation: blink 1.5s infinite;
+    }
+
+    @@keyframes blink {
+        0%, 100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.4;
+        }
+    }
+
+    /* Cards de Funciones */
+    .icon-circle {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+
+    .ai-feature-card {
+        transition: 0.3s;
+        border: 1px solid #f1f5f9 !important;
+        background: #fff;
+    }
+
+        .ai-feature-card:hover {
+            border-color: var(--accent-cyan) !important;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+    /* Fondo de Rejilla */
+    .tech-grid {
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(var(--accent-cyan) 0.5px, transparent 0.5px);
+        background-size: 20px 20px;
+        opacity: 0.1;
+    }
+
+    .bg-accent {
+        background-color: var(--accent-cyan);
+    }
+
+    .border-dashed {
+        border: 2px dashed #e2e8f0;
+    }
+
+    .ls-1 {
+        letter-spacing: 1px;
+    }
+
+    .btn-dark-accent {
+        background: var(--dark-deep);
+        color: white;
+        border: none;
+        transition: 0.4s;
+    }
+
+        .btn-dark-accent:hover {
+            background: #000;
+            color: var(--accent-cyan);
+            box-shadow: 0 10px 20px rgba(0,204,205,0.2);
+        }
+</style>

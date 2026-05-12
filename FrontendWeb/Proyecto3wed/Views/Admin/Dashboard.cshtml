@@ -1,0 +1,251 @@
+@model DashboardResumenDto?
+@{
+    ViewData["Title"] = "Panel Administrativo";
+    var metrics = new[]
+    {
+        ("Libros", Model?.TotalLibros ?? 0, "Catálogo", "fa-book", "#3b82f6"),
+        ("Disponibles", Model?.EjemplaresDisponibles ?? 0, "Stock", "fa-check-circle", "#10b981"),
+        ("Usuarios", Model?.UsuariosActivos ?? 0, "Activos", "fa-users", "#8b5cf6"),
+        ("Préstamos", Model?.PrestamosActivos ?? 0, "Circulación", "fa-exchange-alt", "#f59e0b"),
+        ("Multas", Model?.MultasPendientes ?? 0, "Pendientes", "fa-hand-holding-usd", "#ef4444")
+    };
+}
+
+<style>
+    /* Base del Dashboard */
+    .admin-shell {
+        background: #0a0a0a;
+        min-height: 100vh;
+        color: #f8fafc;
+        padding: 40px 20px;
+        font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    /* Hero Section */
+    .admin-hero {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0) 100%);
+        padding: 30px;
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        margin-bottom: 40px;
+    }
+
+    /* Tarjetas de Métricas (Glassmorphism) */
+    .metric-card {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 20px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .metric-card::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+    /* Paneles de Operaciones */
+    .admin-panel {
+        background: rgba(30, 41, 59, 0.4);
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 25px;
+        height: 100%;
+    }
+
+        .admin-panel h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+    /* Enlaces de Acción */
+    .action-link {
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
+        color: #cbd5e1;
+        text-decoration: none;
+        border-radius: 12px;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+    }
+
+        .action-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #22d3ee;
+            border-color: rgba(34, 211, 238, 0.2);
+        }
+
+    /* Badge IA */
+    .badge-ia {
+        background: linear-gradient(90deg, #8b5cf6, #d946ef);
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: 0.7rem;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    /* Barra de progreso Neón */
+    .progress-neon {
+        background: rgba(255, 255, 255, 0.1);
+        height: 6px;
+        border-radius: 10px;
+    }
+
+    .progress-bar-neon {
+        background: #22d3ee;
+        box-shadow: 0 0 10px #22d3ee;
+    }
+
+    .text-cyan {
+        color: #22d3ee;
+    }
+</style>
+
+<section class="admin-shell container-fluid animate__animated animate__fadeIn">
+
+    <!-- HERO -->
+    <div class="admin-hero d-md-flex justify-content-between align-items-center">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="badge-ia">SISTEMA v3.0</span>
+                <span class="text-cyan small fw-bold">ONLINE</span>
+            </div>
+            <h1 class="display-5 fw-bold">👋 Bienvenido Administrador</h1>
+            <p class="text-muted mb-0">Panel de Control - Núcleo de gestión centralizada.</p>
+        </div>
+        <div class="d-flex gap-2 mt-3 mt-md-0">
+            <a asp-action="NuevoLibro" class="btn btn-primary rounded-pill px-4 shadow">
+                <i class="fas fa-plus me-2"></i>Registrar Libro
+            </a>
+            <a asp-action="ReportePrestamos" class="btn btn-outline-light rounded-pill px-4">
+                <i class="fas fa-file-export"></i>
+            </a>
+        </div>
+    </div>
+
+    @if (Model is null)
+    {
+        <div class="alert bg-danger bg-opacity-10 text-danger border border-danger border-opacity-20 rounded-4 p-3 mb-4">
+            <i class="fas fa-sync-alt fa-spin me-2"></i> Error de sincronización. <a href="#" class="text-danger fw-bold">Reintentar</a>
+        </div>
+    }
+
+    <!-- MÉTRICAS -->
+    <div class="row g-4 mb-5">
+        @foreach (var m in metrics)
+        {
+            <div class="col-6 col-md-4 col-lg">
+                <div class="metric-card">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="small text-muted fw-bold">@m.Item3</span>
+                        <i class="fas @m.Item4" style="color: @m.Item5"></i>
+                    </div>
+                    <h2 class="fw-black mb-1" style="font-size: 2rem;">@m.Item2.ToString("N0")</h2>
+                    <p class="small mb-0 opacity-75">@m.Item1</p>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="row g-4">
+        <!-- OPERACIONES -->
+        <div class="col-lg-4">
+            <div class="admin-panel shadow-lg">
+                <h2><i class="fas fa-layer-group text-cyan"></i> Operaciones</h2>
+                <div class="d-flex flex-column gap-1 mt-3">
+                    <a asp-action="Usuarios" class="action-link"><i class="fas fa-user-shield me-3 opacity-50"></i> Usuarios y Roles</a>
+                    <a asp-action="Libros" class="action-link"><i class="fas fa-book-open me-3 opacity-50"></i> Inventario</a>
+                    <a asp-action="Prestamos" class="action-link"><i class="fas fa-clock me-3 opacity-50"></i> Préstamos Activos</a>
+                    <a asp-action="Reservas" class="action-link"><i class="fas fa-bookmark me-3 opacity-50"></i> Reservas</a>
+                    <a asp-action="Multas" class="action-link"><i class="fas fa-hand-holding-usd me-3 opacity-50"></i> Multas</a>
+                    <a asp-action="Ventas" class="action-link"><i class="fas fa-cash-register me-3 opacity-50"></i> Facturación</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ANALYTICS -->
+        <div class="col-lg-4">
+            <div class="admin-panel mb-4 shadow-lg">
+                <h2><i class="fas fa-fire text-warning"></i> Libros Tendencia</h2>
+                <div class="mt-3">
+                    @if (Model?.LibrosMasPrestados?.Any() == true)
+                    {
+                        foreach (var libro in Model.LibrosMasPrestados)
+                        {
+                            <div class="d-flex align-items-center justify-content-between p-2 mb-2 rounded-3" style="background: rgba(255,255,255,0.03)">
+                                <span class="small text-truncate" style="max-width: 150px;">@libro.Titulo</span>
+                                <span class="badge rounded-pill" style="background: rgba(34, 211, 238, 0.1); color: #22d3ee;">@libro.Veces lecturas</span>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+
+            <div class="admin-panel shadow-lg" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(15, 23, 42, 0.4) 100%);">
+                <h2><i class="fas fa-shield-virus text-success"></i> Estado de Seguridad</h2>
+                <div class="small mt-3">
+                    <div class="d-flex justify-content-between mb-2"><span>Encriptación AES-256</span> <i class="fas fa-check text-success"></i></div>
+                    <div class="d-flex justify-content-between mb-2"><span>Firewall Azure</span> <i class="fas fa-check text-success"></i></div>
+                    <div class="d-flex justify-content-between"><span>Auditoría Logs</span> <i class="fas fa-check text-success"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IA & SYSTEM -->
+        <div class="col-lg-4">
+            <div class="admin-panel mb-4 shadow-lg" style="border: 1px solid rgba(139, 92, 246, 0.3);">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="m-0"><i class="fas fa-brain text-purple"></i> Smart IA</h2>
+                    <span class="badge-ia">ACTIVO</span>
+                </div>
+                <p class="small text-muted">Optimización de inventario basada en demanda.</p>
+                <div class="progress-neon mt-3">
+                    <div class="progress-bar-neon" style="width: 85%; height: 100%; border-radius: 10px;"></div>
+                </div>
+                <div class="d-flex justify-content-between mt-2"><span class="extra-small opacity-50">Eficiencia Operativa</span> <span class="extra-small">85%</span></div>
+
+                <div class="mt-4">
+                    <a asp-action="Gamificacion" class="btn btn-sm btn-dark border-secondary w-100 mb-2 rounded-pill">Ranking Lectores</a>
+                </div>
+            </div>
+
+            <div class="admin-panel bg-black text-white">
+                <h2><i class="fas fa-server opacity-50"></i> Infraestructura</h2>
+                <div class="d-flex flex-wrap gap-2 mt-3">
+                    <span class="badge border border-secondary text-secondary">Docker</span>
+                    <span class="badge border border-secondary text-secondary">Azure</span>
+                    <span class="badge border border-secondary text-secondary">.NET 8</span>
+                </div>
+                <a asp-action="SistemaTecnico" class="btn btn-link text-cyan btn-sm p-0 mt-3 text-decoration-none">Ver logs del servidor <i class="fas fa-external-link-alt ms-1"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+}

@@ -1,0 +1,211 @@
+@model List<PrestamoDto>
+@{
+    ViewData["Title"] = "Gestión de Préstamos";
+}
+
+<style>
+    :root {
+        --dark-dark: #0a0a0a;
+        --accent-cyan: #8b5cf6;
+        --glow-cyan: rgba(0, 204, 205, 0.3);
+    }
+
+    .bg-gradient-dark {
+        background: linear-gradient(135deg, var(--dark-dark) 0%, #171717 100%);
+    }
+
+    /* --- TABLA PREMIUM --- */
+    .custom-table thead th {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #64748b;
+        padding: 1.2rem 1rem;
+        border: none;
+    }
+
+    .custom-table tbody tr {
+        transition: all 0.2s ease;
+    }
+
+        .custom-table tbody tr:hover {
+            background-color: #f8fafc;
+            transform: scale(1.002);
+        }
+
+    /* --- COMPONENTES --- */
+    .btn-blur {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: 0.3s;
+    }
+
+        .btn-blur:hover {
+            background: var(--accent-cyan);
+            color: var(--dark-dark);
+        }
+
+    .btn-dark-accent {
+        background: var(--dark-dark);
+        color: var(--accent-cyan);
+        border: none;
+        font-weight: 700;
+        transition: 0.3s;
+    }
+
+        .btn-dark-accent:hover {
+            background: var(--accent-cyan);
+            color: var(--dark-dark);
+            box-shadow: 0 0 15px var(--glow-cyan);
+        }
+
+    .extra-small {
+        font-size: 0.7rem;
+    }
+
+    .ls-2 {
+        letter-spacing: 2px;
+    }
+
+    .fw-800 {
+        font-weight: 800;
+    }
+</style>
+
+<section class="container py-5 animate__animated animate__fadeIn">
+    <!-- Header -->
+    <div class="header-premium p-4 p-md-5 mb-4 rounded-5 bg-gradient-dark d-flex justify-content-between align-items-center shadow-lg">
+        <div class="ps-3 text-white">
+            <span class="text-accent small fw-bold ls-2 text-uppercase">Control Operativo</span>
+            <h1 class="display-6 fw-800 mb-0">Registro de Préstamos</h1>
+        </div>
+        <div class="pe-3">
+            <a asp-action="Dashboard" class="btn btn-blur rounded-pill p-3">
+                <i class="fas fa-th-large"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Tabla de Contenido -->
+    <div class="card border-0 shadow-lg rounded-5 overflow-hidden bg-white">
+        <div class="table-responsive">
+            <table class="table align-middle custom-table mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4">Usuario / Referencia</th>
+                        <th>Fecha Préstamo</th>
+                        <th>Devolución Esperada</th>
+                        <th class="text-center">Estado</th>
+                        <th class="pe-4 text-end">Operaciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model)
+                    {
+                        bool esRetrasado = p.Estado == 1 && p.FechaDevolucionEsperada < DateTime.Today;
+
+                        var estadoClase = p.Estado == 1 ? (esRetrasado ? "bg-danger text-white shadow-sm" : "bg-warning text-dark")
+                        : (p.Estado == 2 ? "bg-success text-white" : "bg-secondary text-white");
+
+                        var estadoTexto = p.Estado == 1 ? (esRetrasado ? "Retrasado" : "Activo")
+                        : (p.Estado == 2 ? "Devuelto" : "Cancelado");
+
+                        <tr>
+                            <td class="ps-4 py-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-mini bg-light rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                        <i class="fas fa-user text-muted"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-white-dark">@p.Usuario?.NombreCompleto</div>
+                                        <div class="extra-small text-primary fw-bold">PRÉSTAMO #@p.Id</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="fw-medium">@p.FechaPrestamo.ToString("dd/MM/yyyy")</div>
+                                <div class="extra-small text-muted">Emisión</div>
+                            </td>
+                            <td>
+                                <div class="fw-bold @(esRetrasado ? "text-danger" : "text-white")">
+                                    @p.FechaDevolucionEsperada.ToString("dd/MM/yyyy")
+                                </div>
+                                @if (esRetrasado)
+                                {
+                                    <div class="extra-small text-danger fw-bold"><i class="fas fa-clock me-1"></i>Vencido</div>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <span class="badge @estadoClase px-3 py-2 rounded-pill fw-bold" style="min-width: 90px;">
+                                    @estadoTexto
+                                </span>
+                            </td>
+                            <td class="pe-4 text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    @if (p.Estado == 1)
+                                    {
+                                        <form asp-action="RegistrarDevolucion" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@p.Id" />
+                                            <button class="btn btn-dark-accent btn-sm rounded-pill px-3 shadow-sm">
+                                                <i class="fas fa-undo-alt me-1"></i> DEVOLVER
+                                            </button>
+                                        </form>
+
+                                        @if (esRetrasado)
+                                        {
+                                            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#notifModal-@p.Id">
+                                                <i class="fas fa-bell"></i>
+                                            </button>
+
+                                            <!-- Modal de Notificación -->
+                                            <div class="modal fade" id="notifModal-@p.Id" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content rounded-5 border-0 shadow-lg overflow-hidden">
+                                                        <form asp-action="EnviarNotificacion" method="post">
+                                                            @Html.AntiForgeryToken()
+                                                            <input type="hidden" name="UsuarioId" value="@p.UsuarioId" />
+                                                            <input type="hidden" name="returnUrl" value="~/Admin/Prestamos" />
+
+                                                            <div class="modal-header bg-danger text-white border-0 p-4">
+                                                                <h5 class="modal-title fw-bold"><i class="fas fa-exclamation-triangle me-2"></i>Notificar Retraso</h5>
+                                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                            </div>
+                                                            <div class="modal-body p-4 bg-light text-start">
+                                                                <div class="mb-3">
+                                                                    <label class="form-label fw-bold small text-muted">Título de la Alerta</label>
+                                                                    <input type="text" name="Titulo" class="form-control border-0 shadow-sm" value="Devolución Vencida" required />
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label class="form-label fw-bold small text-muted">Mensaje</label>
+                                                                    <textarea name="Mensaje" class="form-control border-0 shadow-sm" rows="3" required>Hola @p.Usuario?.NombreCompleto, el préstamo #@p.Id venció el @p.FechaDevolucionEsperada.ToString("dd/MM/yyyy"). Por favor, regulariza tu situación.</textarea>
+                                                                </div>
+                                                                <input type="hidden" name="Tipo" value="Alerta" />
+                                                            </div>
+                                                            <div class="modal-footer bg-light border-0 p-4">
+                                                                <button type="button" class="btn btn-white rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Cerrar</button>
+                                                                <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold shadow">Enviar Notificación</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="badge bg-light text-success border border-success-subtle rounded-pill px-3 py-2 small">
+                                            <i class="fas fa-check-circle me-1"></i> Completado
+                                        </div>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

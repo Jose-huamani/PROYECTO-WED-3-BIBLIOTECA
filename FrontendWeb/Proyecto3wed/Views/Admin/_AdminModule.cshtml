@@ -1,0 +1,181 @@
+@model AdminModuleDto
+@{
+    ViewData["Title"] = Model.Titulo;
+}
+
+<style>
+    /* Fondo con profundidad tecnológica */
+    .admin-wrapper {
+        background: radial-gradient(circle at 0% 0%, #0a0a0a 0%, #171717 100%);
+        min-height: 100vh;
+        padding-top: 50px;
+        padding-bottom: 50px;
+        color: #f8fafc;
+    }
+
+    /* Etiquetas de acento */
+    .text-accent {
+        color: #22d3ee; /* Cian brillante */
+        letter-spacing: 2px;
+        font-size: 0.75rem;
+    }
+
+    /* Tarjeta Blanca Refinada (Glassmorphism sutil) */
+    .glass-card-light {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        transition: transform 0.3s ease;
+    }
+
+    /* Tarjeta Navy (Panel de Control) */
+    .glass-card-navy {
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(15px);
+        border-radius: 30px;
+        border: 1px solid rgba(34, 211, 238, 0.2);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Items de Funciones */
+    .function-item {
+        background: #f1f5f9;
+        border: 2px dashed #cbd5e1;
+        transition: all 0.3s ease;
+    }
+
+        .function-item:hover {
+            background: #e2e8f0;
+            border-color: #22d3ee;
+            transform: translateY(-3px);
+        }
+
+    /* Botones Estilizados */
+    .btn-accent-cyan {
+        background: linear-gradient(90deg, #06b6d4, #22d3ee);
+        color: #0a0a0a !important;
+        border: none;
+        box-shadow: 0 10px 20px rgba(34, 211, 238, 0.3);
+        transition: all 0.3s ease;
+    }
+
+        .btn-accent-cyan:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 25px rgba(34, 211, 238, 0.4);
+        }
+
+    .btn-outline-dark {
+        border: 2px solid #22d3ee;
+        color: #22d3ee;
+        transition: all 0.3s ease;
+    }
+
+        .btn-outline-dark:hover {
+            background: #22d3ee;
+            color: #0a0a0a;
+        }
+
+    /* Inputs de búsqueda */
+    .search-input {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        color: white !important;
+    }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+</style>
+
+<div class="admin-wrapper">
+    <section class="container animate__animated animate__fadeIn">
+
+        <!-- HEADER DEL MÓDULO -->
+        <div class="row mb-5 align-items-center">
+            <div class="col-md-8">
+                <span class="text-accent fw-bold text-uppercase mb-2 d-block">Gestión de Sistema</span>
+                <h1 class="display-4 fw-bold mb-2" style="color: #ffffff; text-shadow: 0 0 20px rgba(34, 211, 238, 0.2);">
+                    @Model.Titulo
+                </h1>
+                <p class="lead" style="color: #94a3b8;">@Model.Descripcion</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a asp-action="Dashboard" class="btn btn-outline-dark rounded-pill px-4 fw-bold">
+                    <i class="fas fa-arrow-left me-2"></i>Panel General
+                </a>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- SECCIÓN IZQUIERDA: CAPACIDADES -->
+            <div class="col-lg-8">
+                <div class="glass-card-light p-5 h-100 shadow-lg">
+                    <div class="d-flex align-items-center mb-4 border-bottom pb-3">
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3">
+                            <i class="fas fa-layer-group text-primary fs-4"></i>
+                        </div>
+                        <h4 class="fw-bold text-dark m-0">Capacidades Disponibles</h4>
+                    </div>
+
+                    <div class="row g-3">
+                        @if (Model.Funciones != null)
+                        {
+                            @foreach (var item in Model.Funciones)
+                            {
+                                <div class="col-md-6">
+                                    <div class="function-item p-3 rounded-4 d-flex align-items-center h-100">
+                                        <i class="fas fa-check-double text-info me-3"></i>
+                                        <span class="fw-semibold text-dark small">@item</span>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN DERECHA: ACCIONES -->
+            <div class="col-lg-4">
+                <div class="glass-card-navy p-5 text-white h-100">
+                    <h5 class="fw-bold mb-4 d-flex align-items-center">
+                        <i class="fas fa-bolt text-warning me-2"></i> Acciones de Control
+                    </h5>
+
+                    <div class="vstack gap-4">
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-white-20 text-white-50 border-end-0">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input class="form-control search-input border-start-0" placeholder="Filtrar registros..." />
+                        </div>
+
+                        <button class="btn btn-accent-cyan w-100 rounded-pill py-3 fw-bold">
+                            <i class="fas fa-plus-circle me-2"></i>NUEVO REGISTRO
+                        </button>
+
+                        <hr class="border-white-20 my-2">
+
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <button class="btn btn-outline-light w-100 rounded-4 py-2 small opacity-75" onclick="window.print()">
+                                    <i class="fas fa-print d-block mb-1"></i> Reporte
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button class="btn btn-outline-light w-100 rounded-4 py-2 small opacity-75">
+                                    <i class="fas fa-download d-block mb-1"></i> Exportar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <script src="https://kit.fontawesome.com/your-code.js" crossorigin="anonymous"></script>
+}

@@ -1,0 +1,281 @@
+@model LibroCreateForm
+@{
+    ViewData["Title"] = "Registro manual de libro";
+}
+
+<style>
+    :root {
+        --dark-dark: #0a0a0a;
+        --accent-cyan: #8b5cf6;
+        --glass-bg: rgba(255, 255, 255, 0.9);
+    }
+
+    .admin-shell {
+        background: #f1f5f9;
+        min-height: 100vh;
+        padding-bottom: 5rem;
+    }
+
+    /* --- HEADER ESTILO CONSOLA --- */
+    .admin-page-title {
+        background: var(--dark-dark);
+        color: white;
+        padding: 3rem 2rem;
+        border-radius: 0 0 2.5rem 2.5rem;
+        margin-bottom: -2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .admin-kicker {
+        color: var(--accent-cyan);
+        text-transform: uppercase;
+        font-weight: 800;
+        letter-spacing: 2px;
+        font-size: 0.75rem;
+    }
+
+    /* --- PANELES TIPO CARD PREMIUM --- */
+    .admin-panel {
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.7);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        height: 100%;
+        transition: transform 0.3s ease;
+    }
+
+        .admin-panel h2 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--dark-dark);
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--accent-cyan);
+            padding-left: 1rem;
+        }
+
+    /* --- FORMULARIOS REFINADOS --- */
+    .form-label {
+        font-weight: 700;
+        font-size: 0.8rem;
+        color: #64748b;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        border: 1px solid #e2e8f0;
+        border-radius: 0.8rem;
+        padding: 0.75rem 1rem;
+        transition: all 0.2s;
+    }
+
+        .form-control:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 4px var(--glow-cyan);
+        }
+
+    /* --- QR & BARCODE PREVIEW --- */
+    .qr-preview {
+        background: white;
+        border: 2px dashed #e2e8f0;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    .qr-box, .barcode-box {
+        font-family: 'Courier New', monospace;
+        color: #94a3b8;
+        font-size: 0.8rem;
+        background: #f8fafc;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    /* --- BOTONES --- */
+    .btn-primary {
+        background: var(--dark-dark);
+        border: none;
+        border-radius: 50px;
+        font-weight: 700;
+        padding: 0.8rem 2rem;
+        transition: all 0.3s;
+    }
+
+        .btn-primary:hover {
+            background: var(--accent-cyan);
+            color: var(--dark-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--glow-cyan);
+        }
+
+    .admin-form-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .admin-wide {
+        grid-column: span 2;
+    }
+
+    .admin-full {
+        grid-column: span 3;
+    }
+
+    @@media (max-width: 992px) {
+        .admin-form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .admin-wide, .admin-full {
+            grid-column: span 1;
+        }
+    }
+</style>
+
+<section class="admin-shell">
+    <div class="container">
+        <!-- Header Dinámico -->
+        <div class="admin-page-title d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <span class="admin-kicker">Gestión de Catálogo</span>
+                <h1 class="fw-800 mb-1">Registro Manual de Libro</h1>
+                <p class="mb-0 opacity-75 small">El sistema autogenera metadatos y etiquetas de rastreo.</p>
+            </div>
+            <a asp-action="Libros" class="btn btn-outline-light rounded-pill px-4 btn-sm fw-bold">
+                <i class="fas fa-chevron-left me-2"></i>Volver al Listado
+            </a>
+        </div>
+
+        <form asp-action="NuevoLibro" method="post" class="admin-form-grid container">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger admin-full rounded-4 shadow-sm"></div>
+
+            <!-- Columna Izquierda: Información General (Ancha) -->
+            <article class="admin-panel admin-wide animate__animated animate__fadeInLeft">
+                <h2>Información Esencial</h2>
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label asp-for="Titulo" class="form-label">Título del Libro</label>
+                        <input asp-for="Titulo" class="form-control form-control-lg fw-bold" placeholder="Ej: Cien años de soledad" />
+                        <span asp-validation-for="Titulo" class="text-danger extra-small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="FechaIngreso" class="form-label">Fecha de Adquisición</label>
+                        <input asp-for="FechaIngreso" class="form-control form-control-lg" type="date" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="AutorNombre" class="form-label">Autor / Escritor</label>
+                        <input asp-for="AutorNombre" class="form-control" placeholder="Nombre completo" />
+                        <span asp-validation-for="AutorNombre" class="text-danger extra-small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="CategoriaNombre" class="form-label">Categoría / Género</label>
+                        <input asp-for="CategoriaNombre" class="form-control" placeholder="Ej: Ciencia Ficción" />
+                        <span asp-validation-for="CategoriaNombre" class="text-danger extra-small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Descripcion" class="form-label">Sinopsis General</label>
+                        <textarea asp-for="Descripcion" class="form-control" rows="3" placeholder="Resumen breve para el catálogo público..."></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Introduccion" class="form-label">Introducción o Primer Capítulo</label>
+                        <textarea asp-for="Introduccion" class="form-control" rows="4" placeholder="Extracto de la introducción..."></textarea>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Columna Derecha: Códigos y QR -->
+            <article class="admin-panel animate__animated animate__fadeInRight">
+                <h2>Identificadores Digitales</h2>
+                <div class="qr-preview shadow-inner">
+                    <div class="qr-box mb-3">
+                        <i class="fas fa-qrcode fa-3x mb-2 d-block opacity-25"></i>
+                        <span class="small">Vista previa QR automática</span>
+                    </div>
+                    <div class="barcode-box">
+                        <i class="fas fa-barcode fa-2x mb-1 d-block opacity-25"></i>
+                        <span class="small">@Model.CodigoBarras</span>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <label asp-for="CodigoQR" class="form-label">Código de Rastreo QR</label>
+                    <input asp-for="CodigoQR" class="form-control font-monospace text-primary bg-light" readonly />
+
+                    <label asp-for="CodigoBarras" class="form-label mt-3">Código de Barras (UID)</label>
+                    <input asp-for="CodigoBarras" class="form-control font-monospace text-primary bg-light" readonly />
+                </div>
+
+                <div class="alert alert-info mt-4 rounded-4 border-0 py-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <span class="extra-small">Los códigos se bloquean tras el primer registro.</span>
+                </div>
+            </article>
+
+            <!-- Fila Inferior: Detalles Técnicos -->
+            <article class="admin-panel admin-wide animate__animated animate__fadeInUp">
+                <h2>Parámetros Técnicos e Inventario</h2>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label asp-for="Isbn" class="form-label">ISBN-13</label>
+                        <input asp-for="Isbn" class="form-control" placeholder="978-0-..." />
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="CantidadTotal" class="form-label">Stock Inicial</label>
+                        <input asp-for="CantidadTotal" class="form-control fw-bold text-center" type="number" min="0" />
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Precio" class="form-label text-primary">Valoración (Bs.)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-primary text-white border-0">Bs.</span>
+                            <input asp-for="Precio" class="form-control border-primary" type="number" step="0.01" />
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="NumeroPaginas" class="form-label">Páginas</label>
+                        <input asp-for="NumeroPaginas" class="form-control" type="number" />
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="Idioma" class="form-label">Idioma</label>
+                        <input asp-for="Idioma" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Editorial" class="form-label">Sello Editorial</label>
+                        <input asp-for="Editorial" class="form-control" />
+                    </div>
+                </div>
+            </article>
+
+            <!-- Acciones Finales -->
+            <article class="admin-panel animate__animated animate__fadeInUp" style="animation-delay: 0.2s">
+                <h2>Finalizar Registro</h2>
+                <div class="mb-4">
+                    <label asp-for="ImagenUrl" class="form-label">URL de Portada</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-0"><i class="fas fa-link"></i></span>
+                        <input asp-for="ImagenUrl" class="form-control" placeholder="Enlace a imagen .jpg/.png" />
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary py-3">
+                        <i class="fas fa-save me-2"></i>GUARDAR LIBRO
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary rounded-pill fw-bold" onclick="window.print()">
+                        <i class="fas fa-print me-2"></i>IMPRIMIR ETIQUETA
+                    </button>
+                </div>
+            </article>
+        </form>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

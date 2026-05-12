@@ -1,0 +1,188 @@
+@model List<VentaDto>
+@{
+    ViewData["Title"] = "Historial de Ventas";
+}
+
+<style>
+    :root {
+        --dark-deep: #0a0a0a;
+        --accent-cyan: #8b5cf6;
+        --success-bright: #22c55e;
+    }
+
+    /* --- ESTILO DE TARJETAS KPI --- */
+    .kpi-card {
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+        .kpi-card:hover {
+            transform: translateY(-8px);
+        }
+
+    .bg-dark-gradient {
+        background: linear-gradient(135deg, var(--dark-deep) 0%, #171717 100%);
+    }
+
+    /* --- TABLA DE FACTURACIÓN --- */
+    .custom-table thead th {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        color: #64748b;
+        border: none;
+        padding: 1.2rem 1rem;
+    }
+
+    .ticket-id {
+        font-family: 'Monaco', 'Consolas', monospace;
+        letter-spacing: -0.5px;
+        color: var(--dark-deep);
+    }
+
+    .badge-payment {
+        background: #f1f5f9;
+        color: #475569;
+        font-weight: 600;
+        border: 1px solid #e2e8f0;
+    }
+
+    .row-hover:hover {
+        background-color: #f8fafc !important;
+    }
+
+    /* --- ANIMACIONES --- */
+    .animate-up {
+        animation: fadeInUp 0.6s ease-out both;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<section class="container py-5">
+    <!-- Header -->
+    <div class="header-premium p-4 p-md-5 mb-5 rounded-5 bg-dark-gradient d-flex justify-content-between align-items-center shadow-lg animate-up">
+        <div class="ps-3 text-white">
+            <div class="d-flex align-items-center mb-2">
+                <div class="bg-accent-cyan p-2 rounded-3 me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-file-invoice-dollar text-dark"></i>
+                </div>
+                <span class="text-accent small fw-bold ls-2">CONTROL FINANCIERO</span>
+            </div>
+            <h1 class="h2 fw-800 mb-0">Ventas y Facturación</h1>
+        </div>
+        <div class="pe-3">
+            <a asp-action="Dashboard" class="btn btn-blur rounded-pill p-3 shadow-sm">
+                <i class="fas fa-th-large"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- KPIs Row -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4 animate-up" style="animation-delay: 0.1s">
+            <div class="card kpi-card h-100 border-0 shadow-sm rounded-5 bg-dark-gradient text-white p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <span class="text-accent small fw-bold">TOTAL RECAUDADO</span>
+                    <i class="fas fa-chart-line opacity-25"></i>
+                </div>
+                <h2 class="display-6 fw-800 mb-1">@Model.Sum(v => v.Total).ToString("N2") <small class="h6">Bs</small></h2>
+                <p class="extra-small mb-0 opacity-50"><i class="fas fa-arrow-up me-1"></i>Ingreso bruto acumulado</p>
+            </div>
+        </div>
+
+        <div class="col-md-4 animate-up" style="animation-delay: 0.2s">
+            <div class="card kpi-card h-100 border-0 shadow-sm rounded-5 bg-white p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <span class="text-muted small fw-bold">OPERACIONES</span>
+                    <i class="fas fa-shopping-basket text-light"></i>
+                </div>
+                <h2 class="display-6 fw-800 text-white mb-1">@Model.Count()</h2>
+                <p class="extra-small text-muted mb-0">Ventas realizadas con éxito</p>
+            </div>
+        </div>
+
+        <div class="col-md-4 animate-up" style="animation-delay: 0.3s">
+            <div class="card kpi-card h-100 border-0 shadow-sm rounded-5 bg-light p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <span class="text-success small fw-bold">TICKET PROMEDIO</span>
+                    <i class="fas fa-percentage text-success opacity-25"></i>
+                </div>
+                <h2 class="display-6 fw-800 text-success mb-1">@(Model.Any() ? Math.Round(Model.Average(v => v.Total), 2).ToString("N2") : "0.00") <small class="h6 text-success">Bs</small></h2>
+                <p class="extra-small text-muted mb-0">Promedio de valor por operación</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Operaciones -->
+    <div class="card border-0 shadow-lg rounded-5 overflow-hidden animate-up" style="animation-delay: 0.4s">
+        <div class="card-header bg-white py-4 px-4 border-0">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold text-white mb-0">Registro de Operaciones</h5>
+                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="window.print()">
+                    <i class="fas fa-print me-2"></i>Exportar
+                </button>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table align-middle custom-table mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4">Comprobante / Fecha</th>
+                        <th>Cliente</th>
+                        <th class="text-center">Método</th>
+                        <th class="pe-4 text-end">Importe Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center py-5">
+                                <div class="py-4">
+                                    <i class="fas fa-folder-open fa-3x text-light mb-3"></i>
+                                    <p class="text-muted">Aún no se han registrado transacciones.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    @foreach (var v in Model)
+                    {
+                        <tr class="row-hover">
+                            <td class="ps-4 py-4">
+                                <div class="ticket-id fw-800">#@v.Id.ToString("D6")</div>
+                                <div class="extra-small text-muted"><i class="far fa-clock me-1"></i>@v.FechaVenta.ToString("dd MMM yyyy, HH:mm")</div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-sm bg-light text-white rounded-circle me-3 d-flex align-items-center justify-content-center fw-bold" style="width:32px; height:32px; font-size: 0.7rem;">
+                                        @v.Usuario.Substring(0, 1).ToUpper()
+                                    </div>
+                                    <div class="fw-medium text-white">@v.Usuario</div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge badge-payment px-3 py-2 rounded-pill">
+                                    <i class="fas fa-credit-card me-1 small"></i> @v.MetodoPago
+                                </span>
+                            </td>
+                            <td class="pe-4 text-end">
+                                <div class="fw-800 text-white h5 mb-0">@v.Total.ToString("N2") <span class="small fw-normal opacity-50">Bs</span></div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

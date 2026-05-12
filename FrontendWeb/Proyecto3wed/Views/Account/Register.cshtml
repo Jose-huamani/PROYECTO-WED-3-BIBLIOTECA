@@ -1,0 +1,72 @@
+﻿@model RegisterFormModel
+@{
+    ViewData["Title"] = "Registro de Usuario";
+}
+
+<style>
+    .reg-wrapper {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem;
+    }
+    .reg-card {
+        background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 2rem;
+        width: 100%; max-width: 600px; padding: 3rem; color: white;
+    }
+    .form-control {
+        background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white; border-radius: 1rem; padding: 0.75rem 1rem;
+    }
+    .form-control:focus { background: rgba(255, 255, 255, 0.12); color: white; border-color: #0ea5e9; }
+    .btn-reg { background: #0ea5e9; color: white; border-radius: 1rem; padding: 0.75rem; font-weight: 700; border: none; transition: 0.3s; }
+    .btn-reg:hover { background: #0284c7; transform: translateY(-2px); }
+</style>
+
+<div class="reg-wrapper">
+    <div class="reg-card shadow-2xl animate__animated animate__fadeInUp">
+        <div class="text-center mb-5">
+            <h1 class="fw-bold">Únete a nosotros</h1>
+            <p class="text-muted">Crea tu cuenta para acceder a la biblioteca inteligente</p>
+        </div>
+
+        <form asp-action="Register" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+            
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="NombreCompleto" class="form-label small fw-bold">Nombre Completo</label>
+                    <input asp-for="NombreCompleto" class="form-control" placeholder="Jose Pérez" />
+                    <span asp-validation-for="NombreCompleto" class="text-danger extra-small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Email" class="form-label small fw-bold">Correo Electrónico</label>
+                    <input asp-for="Email" class="form-control" placeholder="jose@univalle.edu" />
+                    <span asp-validation-for="Email" class="text-danger extra-small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Telefono" class="form-label small fw-bold">Teléfono</label>
+                    <input asp-for="Telefono" class="form-control" placeholder="+591 ..." />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Carrera" class="form-label small fw-bold">Carrera</label>
+                    <input asp-for="Carrera" class="form-control" placeholder="Ing. de Sistemas" />
+                </div>
+                <div class="col-12">
+                    <label asp-for="Direccion" class="form-label small fw-bold">Dirección</label>
+                    <input asp-for="Direccion" class="form-control" placeholder="Av. Siempre Viva 123" />
+                </div>
+                <div class="col-12">
+                    <label asp-for="Password" class="form-label small fw-bold">Contraseña</label>
+                    <input asp-for="Password" type="password" class="form-control" placeholder="••••••••" />
+                    <span asp-validation-for="Password" class="text-danger extra-small"></span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-reg w-100 mt-4 shadow-lg">Crear Mi Cuenta</button>
+
+            <div class="text-center mt-4">
+                <p class="text-muted small">¿Ya tienes cuenta? <a asp-action="Login" class="text-info fw-bold text-decoration-none">Inicia Sesión</a></p>
+            </div>
+        </form>
+    </div>
+</div>

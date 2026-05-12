@@ -1,0 +1,169 @@
+﻿@{
+    ViewData["Title"] = "Inicio";
+    var loggedIn = Context.Session.GetString("AccessToken") != null;
+    var nombre = Context.Session.GetString("UserName") ?? "Lector";
+    var hora = DateTime.Now.Hour;
+    var saludo = hora < 12 ? "Buenos dias" : (hora < 18 ? "Buenas tardes" : "Buenas noches");
+}
+
+<style>
+    .hero-home {
+        background: linear-gradient(135deg, #0f172a 0%, #0369a1 60%, #0ea5e9 100%);
+        border-radius: 2rem; padding: 4rem 3rem;
+        position: relative; overflow: hidden; color: white; margin-bottom: 2.5rem;
+    }
+    .hero-home::before {
+        content: ''; position: absolute; inset: 0; opacity: 0.05;
+        background: repeating-linear-gradient(45deg, #fff 0, #fff 1px, transparent 0, transparent 50%);
+        background-size: 20px 20px;
+    }
+    .quick-card {
+        background: white; border-radius: 1.25rem; border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.04); padding: 1.5rem;
+        transition: all 0.3s; text-decoration: none; color: inherit; display: block;
+    }
+    .quick-card:hover { transform: translateY(-6px); box-shadow: 0 15px 35px rgba(14,165,233,0.15); border-color: #0ea5e9; color: inherit; }
+    .q-icon { width: 52px; height: 52px; border-radius: 1rem; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-bottom: 0.75rem; }
+    .book-card { background: white; border-radius: 1.25rem; border: 1px solid #f1f5f9; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: all 0.3s; }
+    .book-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+    .book-cover { height: 200px; object-fit: cover; width: 100%; }
+    .book-cover-ph { height: 200px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #f1f5f9, #e2e8f0); color: #94a3b8; }
+    .section-title { font-size: 1.3rem; font-weight: 800; color: #0f172a; }
+    .section-sub { color: #64748b; font-size: 0.88rem; margin-bottom: 1.5rem; }
+    .cat-card { border-radius: 1rem; padding: 1.25rem; text-align: center; border: 2px solid transparent; transition: 0.3s; cursor: pointer; text-decoration: none; display: block; }
+    .cat-card:hover { border-color: #0ea5e9; transform: translateY(-4px); }
+    .user-stat { text-align: center; padding: 1rem; border-radius: 1rem; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); }
+    .btn-hero { border-radius: 50px; padding: 0.7rem 2rem; font-weight: 700; transition: 0.3s; }
+    .btn-hero:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+    .tag-avail { background:#dcfce7; color:#15803d; padding:2px 10px; border-radius:50px; font-size:0.68rem; font-weight:700; }
+    .tag-out { background:#fee2e2; color:#991b1b; padding:2px 10px; border-radius:50px; font-size:0.68rem; font-weight:700; }
+    .skeleton { background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%); background-size: 200%; animation: shimmer 1.5s infinite; border-radius: 0.5rem; }
+    @@keyframes shimmer { 0%{background-position:200%} 100%{background-position:-200%} }
+</style>
+
+<!-- HERO -->
+<div class="hero-home">
+    <div class="row align-items-center g-4 position-relative">
+        <div class="col-lg-7">
+            @if (loggedIn)
+            {
+                <span class="badge bg-white bg-opacity-25 text-white fw-bold px-3 py-2 mb-3 d-inline-block"><i class="fas fa-user-circle me-1"></i> Sesion activa</span>
+                <h1 class="display-5 fw-bold mb-2">@saludo, @nombre.Split(new[]{' '},2)[0]!</h1>
+                <p class="opacity-75 lead mb-4">Bienvenido a tu biblioteca digital. Explora, reserva y aprende.</p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a asp-controller="Catalogo" asp-action="Index" class="btn btn-white btn-hero fw-bold" style="background:white;color:#0369a1;"><i class="fas fa-book-open me-2"></i>Ver Catalogo</a>
+                    <a asp-controller="MiBiblioteca" asp-action="Prestamos" class="btn btn-outline-light btn-hero"><i class="fas fa-book-reader me-2"></i>Mis Prestamos</a>
+                </div>
+            }
+            else
+            {
+                <span class="badge bg-white bg-opacity-25 text-white fw-bold px-3 py-2 mb-3 d-inline-block">Biblioteca Universitaria</span>
+                <h1 class="display-5 fw-bold mb-2">Tu biblioteca inteligente</h1>
+                <p class="opacity-75 lead mb-4">Accede al catalogo, solicita prestamos, reserva libros y mucho mas.</p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-white btn-hero fw-bold" style="background:white;color:#0369a1;"><i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesion</a>
+                    <a asp-controller="Account" asp-action="Register" class="btn btn-outline-light btn-hero"><i class="fas fa-user-plus me-2"></i>Registrarse</a>
+                </div>
+            }
+        </div>
+        @if (loggedIn)
+        {
+            <div class="col-lg-5">
+                <div class="row g-3">
+                    <div class="col-6"><a href="/MiBiblioteca/Prestamos" class="user-stat d-block text-decoration-none text-white"><i class="fas fa-book-reader mb-2 d-block" style="color:#38bdf8;font-size:1.5rem;"></i><div class="small fw-bold">Mis Prestamos</div></a></div>
+                    <div class="col-6"><a href="/MiBiblioteca/Reservas" class="user-stat d-block text-decoration-none text-white"><i class="fas fa-bookmark mb-2 d-block" style="color:#a78bfa;font-size:1.5rem;"></i><div class="small fw-bold">Mis Reservas</div></a></div>
+                    <div class="col-6"><a href="/MiBiblioteca/Favoritos" class="user-stat d-block text-decoration-none text-white"><i class="fas fa-heart mb-2 d-block" style="color:#fb7185;font-size:1.5rem;"></i><div class="small fw-bold">Favoritos</div></a></div>
+                    <div class="col-6"><a href="/Usuario/Ranking" class="user-stat d-block text-decoration-none text-white"><i class="fas fa-trophy mb-2 d-block" style="color:#fbbf24;font-size:1.5rem;"></i><div class="small fw-bold">Mi Ranking</div></a></div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- ACCESOS RAPIDOS -->
+<div class="row g-3 mb-5">
+    <div class="col-lg-2 col-md-4 col-6"><a href="/Catalogo/Index" class="quick-card text-center"><div class="q-icon mx-auto" style="background:#e0f2fe;color:#0369a1;"><i class="fas fa-book-open"></i></div><div class="fw-bold text-dark small">Catalogo</div><div class="text-muted" style="font-size:0.7rem;">Todos los libros</div></a></div>
+    <div class="col-lg-2 col-md-4 col-6"><a href="/Catalogo/BuscarQr" class="quick-card text-center"><div class="q-icon mx-auto" style="background:#f0fdf4;color:#15803d;"><i class="fas fa-qrcode"></i></div><div class="fw-bold text-dark small">Escanear QR</div><div class="text-muted" style="font-size:0.7rem;">Busqueda rapida</div></a></div>
+    <div class="col-lg-2 col-md-4 col-6"><a href="/Tienda/Index" class="quick-card text-center"><div class="q-icon mx-auto" style="background:#fdf4ff;color:#7e22ce;"><i class="fas fa-shopping-cart"></i></div><div class="fw-bold text-dark small">Tienda</div><div class="text-muted" style="font-size:0.7rem;">Comprar libros</div></a></div>
+    <div class="col-lg-2 col-md-4 col-6"><a href="/MiBiblioteca/Notificaciones" class="quick-card text-center"><div class="q-icon mx-auto" style="background:#fff7ed;color:#c2410c;"><i class="fas fa-bell"></i></div><div class="fw-bold text-dark small">Notificaciones</div><div class="text-muted" style="font-size:0.7rem;">Alertas</div></a></div>
+    <div class="col-lg-2 col-md-4 col-6"><a href="/Usuario/Ranking" class="quick-card text-center"><div class="q-icon mx-auto" style="background:#fef9c3;color:#854d0e;"><i class="fas fa-trophy"></i></div><div class="fw-bold text-dark small">Ranking</div><div class="text-muted" style="font-size:0.7rem;">Top lectores</div></a></div>
+    <div class="col-lg-2 col-md-4 col-6"><a href="/Usuario/Perfil" class="quick-card text-center"><div class="q-icon mx-auto" style="background:#f8fafc;color:#334155;"><i class="fas fa-user"></i></div><div class="fw-bold text-dark small">Mi Perfil</div><div class="text-muted" style="font-size:0.7rem;">Tu cuenta</div></a></div>
+</div>
+
+<!-- LIBROS POPULARES -->
+<div class="mb-5">
+    <div class="d-flex align-items-center justify-content-between mb-1">
+        <div><div class="section-title"><i class="fas fa-fire text-danger me-2"></i>Libros Populares</div><div class="section-sub">Los mas solicitados por la comunidad</div></div>
+        <a asp-controller="Catalogo" asp-action="Index" class="btn btn-outline-primary rounded-pill px-4 small fw-bold">Ver todos <i class="fas fa-arrow-right ms-1"></i></a>
+    </div>
+    <div class="row g-3" id="libros-container">
+        @for (int i = 0; i < 4; i++) {
+            <div class="col-lg-3 col-md-6">
+                <div class="book-card">
+                    <div class="book-cover-ph"><i class="fas fa-book fa-3x"></i></div>
+                    <div class="p-3">
+                        <div class="skeleton mb-2" style="height:14px;"></div>
+                        <div class="skeleton mb-3" style="height:11px;width:60%;"></div>
+                        <div class="skeleton" style="height:32px;border-radius:50px;"></div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- CATEGORIAS -->
+<div class="mb-5">
+    <div class="section-title mb-1"><i class="fas fa-th-large text-primary me-2"></i>Explorar por Categoria</div>
+    <div class="section-sub">Encuentra libros segun tu area de interes</div>
+    <div class="row g-3">
+        <div class="col-lg-3 col-md-4 col-6"><a asp-controller="Catalogo" asp-action="Index" class="cat-card" style="background:#e0f2fe;color:#0369a1;"><div style="font-size:2rem;" class="mb-2">Ciencias</div><div class="fw-bold small">Ciencias</div></a></div>
+        <div class="col-lg-3 col-md-4 col-6"><a asp-controller="Catalogo" asp-action="Index" class="cat-card" style="background:#f5f3ff;color:#7c3aed;"><div style="font-size:2rem;" class="mb-2">Tecnologia</div><div class="fw-bold small">Tecnologia</div></a></div>
+        <div class="col-lg-3 col-md-4 col-6"><a asp-controller="Catalogo" asp-action="Index" class="cat-card" style="background:#f0fdfa;color:#0d9488;"><div style="font-size:2rem;" class="mb-2">Ingenieria</div><div class="fw-bold small">Ingenieria</div></a></div>
+        <div class="col-lg-3 col-md-4 col-6"><a asp-controller="Catalogo" asp-action="Index" class="cat-card" style="background:#fffbeb;color:#b45309;"><div style="font-size:2rem;" class="mb-2">Literatura</div><div class="fw-bold small">Literatura</div></a></div>
+    </div>
+</div>
+
+<!-- BANNER GAMIFICACION -->
+<div class="rounded-4 p-4 mb-4 text-white position-relative overflow-hidden" style="background:linear-gradient(135deg,#4f46e5,#7c3aed);">
+    <div class="row align-items-center g-3">
+        <div class="col-lg-8">
+            <h4 class="fw-bold mb-1">Sistema de Gamificacion</h4>
+            <p class="opacity-75 mb-3">Lee libros, acumula puntos y compite en el ranking.</p>
+            <div class="d-flex gap-3 flex-wrap">
+                <div class="bg-white bg-opacity-15 rounded-3 px-3 py-2 text-center"><div class="fw-bold">+10pts</div><div class="small opacity-75">por prestamo</div></div>
+                <div class="bg-white bg-opacity-15 rounded-3 px-3 py-2 text-center"><div class="fw-bold">+5pts</div><div class="small opacity-75">devolucion a tiempo</div></div>
+                <div class="bg-white bg-opacity-15 rounded-3 px-3 py-2 text-center"><div class="fw-bold">Medallas</div><div class="small opacity-75">logros especiales</div></div>
+            </div>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+            <a asp-controller="Usuario" asp-action="Ranking" class="btn fw-bold rounded-pill px-4" style="background:white;color:#4f46e5;">Ver Ranking</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+fetch("/Catalogo/LibrosJson")
+    .then(r => r.ok ? r.json() : null)
+    .then(libros => {
+        if (!libros || libros.length === 0) return;
+        const c = document.getElementById("libros-container");
+        c.innerHTML = libros.slice(0,4).map(l => `
+            <div class="col-lg-3 col-md-6">
+              <div class="book-card">
+                ${l.imagenUrl ? `<img src="${l.imagenUrl}" class="book-cover" alt="Portada" onerror="this.style.display='none'">` : `<div class="book-cover-ph"><i class="fas fa-book fa-3x"></i></div>`}
+                <div class="p-3">
+                  <span class="${l.cantidadDisponible>0?'tag-avail':'tag-out'} mb-2 d-inline-block">${l.cantidadDisponible>0?'Disponible':'Sin stock'}</span>
+                  <h6 class="fw-bold text-dark mb-1 text-truncate">${l.titulo}</h6>
+                  <p class="text-muted small mb-3">${l.autor?.nombre??'Anonimo'}</p>
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="fw-bold text-primary">Bs. ${(l.precio||0).toFixed(2)}</span>
+                  </div>
+                  <a href="/Catalogo/Detalle/${l.id}" class="btn btn-primary btn-sm w-100 rounded-pill fw-bold">Ver Detalles</a>
+                </div>
+              </div>
+            </div>`).join("");
+    }).catch(()=>{});
+</script>
+}

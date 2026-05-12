@@ -1,0 +1,258 @@
+@model LibroDto
+@{
+    ViewData["Title"] = Model.Titulo;
+    var logged = ViewBag.LoggedIn as bool? ?? false;
+}
+
+<style>
+    :root {
+        --dark-deep: #0a0a0a;
+        --accent-cyan: #8b5cf6;
+        --soft-bg: #f8fafc;
+    }
+
+    .breadcrumb-item a {
+        color: var(--accent-cyan);
+        font-weight: 600;
+    }
+
+    /* --- PORTADA Y CONTENEDORES --- */
+    .libro-hero-card {
+        border-radius: 2rem;
+        background: white;
+        overflow: hidden;
+    }
+
+    .portada-wrapper {
+        perspective: 1000px;
+    }
+
+    .portada-img {
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 15px 35px rgba(16, 29, 66, 0.2);
+    }
+
+    .portada-wrapper:hover .portada-img {
+        transform: rotateY(-5deg) scale(1.03);
+        box-shadow: 0 20px 45px rgba(16, 29, 66, 0.3);
+    }
+
+    /* --- ESTADOS DE STOCK --- */
+    .stock-indicator {
+        background: var(--soft-bg);
+        border-left: 5px solid var(--accent-cyan);
+        transition: all 0.3s ease;
+    }
+
+        .stock-indicator:hover {
+            background: #f1f5f9;
+            transform: translateX(5px);
+        }
+
+    /* --- QR PANEL --- */
+    .qr-sidebar-card {
+        background: linear-gradient(135deg, var(--dark-deep) 0%, #171717 100%);
+        border-radius: 2rem;
+    }
+
+    .qr-frame {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 1.5rem;
+        display: inline-block;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    /* --- BOTONES --- */
+    .btn-floating-action {
+        transition: all 0.3s;
+        border: 2px solid transparent;
+    }
+
+        .btn-floating-action:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 204, 205, 0.3);
+        }
+</style>
+
+<nav aria-label="breadcrumb" class="mb-5 animate__animated animate__fadeIn">
+    <ol class="breadcrumb bg-light p-3 rounded-pill px-4 shadow-sm">
+        <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none">Catálogo Digital</a></li>
+        <li class="breadcrumb-item active text-white fw-bold" aria-current="page">@Model.Titulo</li>
+    </ol>
+</nav>
+
+<div class="row g-5">
+    <!-- Información Principal -->
+    <div class="col-lg-8 animate__animated animate__fadeInLeft">
+        <div class="card libro-hero-card border-0 shadow-lg">
+            <div class="card-body p-4 p-md-5">
+                <div class="row align-items-start mb-5">
+                    <div class="col-md-5 col-xl-4 mb-4 mb-md-0">
+                        <div class="portada-wrapper">
+                            @if (!string.IsNullOrEmpty(Model.ImagenUrl))
+                            {
+                                <img src="@Model.ImagenUrl" alt="@Model.Titulo" class="img-fluid rounded-4 portada-img w-100" style="aspect-ratio: 2/3; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <div class="bg-light d-flex flex-column align-items-center justify-content-center text-muted rounded-4 portada-img" style="aspect-ratio: 2/3;">
+                                    <i class="fas fa-book-open fa-4x mb-3 opacity-20"></i>
+                                    <span class="fw-bold small text-uppercase ls-1">Sin Imagen</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-md-7 col-xl-8 ps-md-4">
+                        <div class="mb-3">
+                            <span class="badge rounded-pill px-3 py-2 bg-info bg-opacity-10 text-info border border-info border-opacity-25">
+                                <i class="fas fa-layer-group me-2"></i>@Model.Categoria?.Nombre
+                            </span>
+                        </div>
+                        <h1 class="display-5 fw-800 text-white mb-2">@Model.Titulo</h1>
+                        <p class="h4 text-muted fw-light mb-4">por <span class="text-white fw-normal">@Model.Autor?.Nombre</span></p>
+
+                        <div class="hstack gap-3 flex-wrap mb-4">
+                            <div class="bg-light px-3 py-2 rounded-3 border">
+                                <small class="text-muted d-block fw-bold" style="font-size: 0.6rem;">ISBN-13</small>
+                                <span class="fw-mono small text-white">@Model.Isbn</span>
+                            </div>
+                            <div class="bg-light px-3 py-2 rounded-3 border">
+                                <small class="text-muted d-block fw-bold" style="font-size: 0.6rem;">SISTEMA ID</small>
+                                <code class="text-accent fw-bold small">#@Model.CodigoQR</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Descripción -->
+                <div class="mb-5">
+                    <h4 class="h5 fw-bold text-white mb-3"><i class="fas fa-align-left me-2 text-accent"></i>Sinopsis del ejemplar</h4>
+                    <p class="text-secondary lh-lg">
+                        @(string.IsNullOrEmpty(Model.Descripcion) ? "No hay una descripción disponible para este libro en el sistema actualmente." : Model.Descripcion)
+                    </p>
+                </div>
+
+                <!-- Panel de Inventario -->
+                <div class="stock-indicator p-4 rounded-4 shadow-sm mb-5">
+                    <div class="row align-items-center g-3 text-center text-md-start">
+                        <div class="col-md-3">
+                            <h2 class="display-6 fw-800 text-white mb-0">@Model.CantidadDisponible</h2>
+                            <small class="text-muted fw-bold text-uppercase ls-1">Disponibles</small>
+                        </div>
+                        <div class="col-md-3 border-md-start border-md-end">
+                            <h2 class="display-6 fw-800 text-muted mb-0 opacity-50">@Model.CantidadTotal</h2>
+                            <small class="text-muted fw-bold text-uppercase ls-1">En Stock</small>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            @if (Model.CantidadDisponible > 0)
+                            {
+                                <div class="badge bg-success bg-opacity-10 text-success p-3 rounded-4 border border-success border-opacity-25">
+                                    <i class="fas fa-check-double me-2"></i>DISPONIBILIDAD INMEDIATA
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="badge bg-danger bg-opacity-10 text-danger p-3 rounded-4 border border-danger border-opacity-25">
+                                    <i class="fas fa-hourglass-half me-2"></i>CONSULTAR FECHA DE DEVOLUCIÓN
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Acciones -->
+                @if (logged)
+                {
+                    <div class="d-flex flex-wrap gap-3">
+                        <a asp-controller="MiBiblioteca" asp-action="SolicitarPrestamo" class="btn btn-accent btn-floating-action btn-lg px-5 fw-800 rounded-pill shadow">
+                            <i class="fas fa-bookmark me-2"></i>SOLICITAR PRÉSTAMO
+                        </a>
+                        <form asp-controller="MiBiblioteca" asp-action="CrearReserva" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="libroId" value="@Model.Id" />
+                            <button type="submit" class="btn btn-outline-dark btn-floating-action btn-lg px-4 rounded-pill" @(Model.CantidadDisponible <= 0 ? "disabled" : "")>
+                                <i class="far fa-calendar-check me-2"></i>Reservar
+                            </button>
+                        </form>
+                        <form asp-controller="Tienda" asp-action="Agregar" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="libroId" value="@Model.Id" />
+                            <input type="hidden" name="cantidad" value="1" />
+                            <button type="submit" class="btn btn-primary btn-floating-action btn-lg px-4 rounded-pill" @(Model.CantidadDisponible <= 0 ? "disabled" : "")>
+                                <i class="fas fa-shopping-cart me-2"></i>Comprar
+                            </button>
+                        </form>
+
+                        <form asp-controller="MiBiblioteca" asp-action="AgregarFavorito" method="post" class="ms-md-auto">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="libroId" value="@Model.Id" />
+                            <button type="submit" class="btn btn-white border shadow-sm btn-lg p-3 rounded-circle text-danger hover-zoom">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </form>
+                        <div class="dropdown ms-md-auto mt-3 mt-md-0">
+                            <button class="btn btn-white border shadow-sm btn-lg p-3 rounded-circle text-primary hover-zoom dropdown-toggle" type="button" id="shareDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-share-alt"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2" aria-labelledby="shareDropdown">
+                                <li><h6 class="dropdown-header fw-bold">Compartir vía...</h6></li>
+                                <li><a class="dropdown-item py-2" href="https://api.whatsapp.com/send?text=Mira%20este%20libro%20increíble:%20@Model.Titulo" target="_blank"><i class="fab fa-whatsapp text-success me-2"></i>WhatsApp</a></li>
+                                <li><a class="dropdown-item py-2" href="https://www.facebook.com/sharer/sharer.php?u=#" target="_blank"><i class="fab fa-facebook text-primary me-2"></i>Facebook</a></li>
+                                <li><a class="dropdown-item py-2" href="https://t.me/share/url?url=#&text=@Model.Titulo" target="_blank"><i class="fab fa-telegram text-info me-2"></i>Telegram</a></li>
+                                <li><a class="dropdown-item py-2" href="mailto:?subject=Recomendación de libro: @Model.Titulo&body=Revisa este libro en la biblioteca." target="_blank"><i class="fas fa-envelope text-danger me-2"></i>Gmail</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><button class="dropdown-item py-2" onclick="navigator.clipboard.writeText(window.location.href); alert('Enlace copiado al portapapeles');"><i class="fas fa-link text-secondary me-2"></i>Copiar Enlace</button></li>
+                            </ul>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="bg-dark bg-opacity-10 p-4 rounded-4 border border-navy border-opacity-10 d-flex align-items-center">
+                        <div class="me-3"><i class="fas fa-user-lock fa-2x text-white"></i></div>
+                        <div>
+                            <p class="mb-0 fw-bold text-white">Acceso restringido</p>
+                            <small class="text-muted">Debes <a asp-controller="Account" asp-action="Login" class="text-accent fw-bold">iniciar sesión</a> para realizar trámites de biblioteca.</small>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Barra Lateral: QR e Identificación -->
+    <div class="col-lg-4 animate__animated animate__fadeInRight">
+        <div class="card qr-sidebar-card border-0 text-white mb-4 shadow-lg overflow-hidden">
+            <div class="card-body text-center p-5 position-relative">
+                <div class="mb-4">
+                    <span class="text-accent small fw-bold ls-2 text-uppercase">Validación Física</span>
+                    <h3 class="h5 fw-bold mt-1">Identificador QR</h3>
+                </div>
+
+                <div class="qr-frame mb-4">
+                    <img src="@Url.Action("QrLibroPng", "Catalogo", new { id = Model.Id })"
+                         alt="Código QR del libro" class="img-fluid" width="200" />
+                </div>
+
+                <p class="small opacity-75 mb-4 px-2">
+                    Presenta este código en los puntos de control de <strong>Sistemas Univalle</strong> para validar el retiro o devolución del ejemplar.
+                </p>
+
+                <div class="bg-white bg-opacity-10 p-3 rounded-4 border border-white border-opacity-10 mb-2">
+                    <span class="d-block small text-accent fw-bold mb-1">HASH ÚNICO</span>
+                    <code class="text-white fw-bold">@Model.CodigoQR</code>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-grid gap-3">
+            <a asp-action="BuscarQr" class="btn btn-white border-2 border-light shadow-sm rounded-pill fw-bold py-3 text-white">
+                <i class="fas fa-expand me-2 text-accent"></i>ESCANEAR OTRO CÓDIGO
+            </a>
+            <button class="btn btn-light rounded-pill py-2 small fw-bold opacity-75" onclick="window.print()">
+                <i class="fas fa-print me-2"></i>Imprimir Ficha
+            </button>
+        </div>
+    </div>
+</div>

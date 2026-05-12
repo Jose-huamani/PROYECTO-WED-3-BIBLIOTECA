@@ -1,0 +1,54 @@
+﻿@{
+    ViewData["Title"] = "Pago con QR";
+    var monto = ViewBag.Monto;
+    var referencia = ViewBag.Referencia;
+    var operacion = ViewBag.Operacion;
+}
+
+<style>
+    .pago-shell { background: #f1f5f9; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+    .pago-card { background: white; border-radius: 2.5rem; max-width: 500px; width: 100%; box-shadow: 0 20px 50px rgba(0,0,0,0.1); overflow: hidden; }
+    .qr-container { background: #f8fafc; padding: 2rem; text-align: center; border-bottom: 1px dashed #e2e8f0; }
+    .qr-box { background: white; padding: 1rem; border-radius: 1.5rem; display: inline-block; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+    .qr-image { width: 250px; height: 250px; }
+    .pago-info { padding: 2rem; }
+    .info-item { display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.9rem; }
+    .info-label { color: #64748b; font-weight: 600; }
+    .info-value { color: #1e293b; font-weight: 800; }
+</style>
+
+<div class="pago-shell">
+    <div class="pago-card animate__animated animate__zoomIn">
+        <div class="qr-container">
+            <div class="mb-4">
+                <h4 class="fw-bold text-dark mb-1">Escanea para pagar</h4>
+                <p class="text-muted small">Usa tu aplicacion bancaria favorita</p>
+            </div>
+            <div class="qr-box">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=PagoBiblioteca-@monto-@referencia" class="qr-image" alt="QR Pago">
+            </div>
+            <div class="mt-4">
+                <div class="display-6 fw-bold text-primary">Bs. @monto.ToString("F2")</div>
+            </div>
+        </div>
+        <div class="pago-info">
+            <div class="info-item">
+                <span class="info-label">Referencia</span>
+                <span class="info-value">@referencia</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">No. Operacion</span>
+                <span class="info-value">@operacion</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Estado</span>
+                <span class="info-value text-warning"><i class="fas fa-clock me-1"></i> Esperando confirmacion</span>
+            </div>
+            <hr>
+            <div class="text-center mt-4">
+                <button onclick="window.history.back()" class="btn btn-light rounded-pill px-4 fw-bold me-2">Cancelar</button>
+                <a href="/MiBiblioteca/Multas" class="btn btn-primary rounded-pill px-4 fw-bold">Ya realice el pago</a>
+            </div>
+        </div>
+    </div>
+</div>
